@@ -1,5 +1,4 @@
-################ Need SQLite drivers for java #####################
- SQLite JDBC Driver
+################ SQLite JDBC Driver#####################
 
  https://oss.sonatype.org/content/repositories/releases/org/xerial/sqlite-jdbc/
   ####################################################################
