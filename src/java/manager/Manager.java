@@ -12,7 +12,7 @@ public class Manager {
 	private HashMap<byte[], HashMap<byte[], ArrayList<DomainCredentials>>> _pubKeys = new HashMap<byte[], HashMap<byte[], ArrayList<DomainCredentials>>>();
 	
 	/*TODO - implement*/
-	public byte[] searchPassword(byte[] pubKey, byte[] domain, byte[] username) throws PasswordManagerExceptionHandler{
+	private byte[] searchPassword(byte[] pubKey, byte[] domain, byte[] username) throws PasswordManagerExceptionHandler{
 		byte[] toRet = null; 
 		
 		for (DomainCredentials dc : getDomains(pubKey, domain)) {

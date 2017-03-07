@@ -1,11 +1,24 @@
 package ws;
 
-import javax.jws.WebService;  
+import javax.jws.WebService;
+import java.security.Key;
+import exception.PasswordManagerExceptionHandler;  
+import controller.Manager;
 
-@WebService(endpointInterface="ws.PasswordManagerWS")    
+@SuppressWarnings("restriction")
+@WebService(endpointInterface="ws.PasswordManagerWS")
 public class PasswordManagerWSImpl implements PasswordManagerWS {
+	Manager manager = new Manager();
 	
-	public String helloWorld(String name) {  
-		return "Hello world from "+name;  
+	public void register(Key pubKey) throws PasswordManagerExceptionHandler{
+		manager.register(pubKey);
+	}
+
+	public void put(Key pubKey, byte[] domain, byte[] username, byte[] password) throws PasswordManagerExceptionHandler{
+		manager.put(pubKey, domain, username, password);
+	} 
+	
+	public void get(Key pubKey, byte[] domain, byte[] username) throws PasswordManagerExceptionHandler{
+		manager.get(pubKey, domain, username);
 	} 
 }
