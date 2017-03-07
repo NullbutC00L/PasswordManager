@@ -32,4 +32,9 @@ public class DB {
      }
    }
  }
+ public static void add(){
+  try{
+    }
+    catch(Exception e){}
+ }
 }
