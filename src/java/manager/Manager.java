@@ -6,7 +6,7 @@ import exception.PasswordManagerExceptionHandler;
 
 import java.util.HashMap;
 
-public class Manger {
+public class Manager {
 	
 	private HashMap<byte[], HashMap<byte[], ArrayList<DomainCredentials>>> _pubKeys = new HashMap<byte[], HashMap<byte[], ArrayList<DomainCredentials>>>();
 	
