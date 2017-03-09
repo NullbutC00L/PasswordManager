@@ -1,26 +1,25 @@
 package ws;
 
-import java.security.Key;
-
 import javax.jws.WebService;
 
-import controller.Manager;
 import exception.PasswordManagerExceptionHandler;
+import manager.Manager;
 
 @SuppressWarnings("restriction")
 @WebService(endpointInterface="ws.PasswordManagerWS")
 public class PasswordManagerWSImpl implements PasswordManagerWS {
 	Manager manager = new Manager();
 	
-	public void register(Key pubKey) throws PasswordManagerExceptionHandler{
+	public void register(byte[] pubKey) throws PasswordManagerExceptionHandler{
 		manager.register(pubKey);
 	}
 
-	public void put(Key pubKey, byte[] domain, byte[] username, byte[] password) throws PasswordManagerExceptionHandler{
-		manager.put(pubKey, domain, username, password);
+	public void put(byte[] pubKey, byte[] domain, byte[] username, byte[] password) throws PasswordManagerExceptionHandler{
+		manager.insert(pubKey, domain, username, password);
 	} 
 	
-	public void get(Key pubKey, byte[] domain, byte[] username) throws PasswordManagerExceptionHandler{
-		manager.get(pubKey, domain, username);
-	} 
+	public void get(byte[] pubKey, byte[] domain, byte[] username) throws PasswordManagerExceptionHandler{
+		manager.searchPassword(pubKey, domain, username);
+	}
+		
 }

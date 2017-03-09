@@ -4,8 +4,8 @@ import java.util.ArrayList;
 import java.util.HashMap;
 
 import domain.DomainCredentials;
+import exception.CredentialsNotFoundException;
 import exception.PasswordManagerExceptionHandler;
-import exception.PasswordNotFoundException;
 import exception.PubKeyAlreadyExistsException;
 import exception.UserAlreadyOnDomainException;
 
@@ -14,7 +14,7 @@ public class Manager {
 	private HashMap<byte[], HashMap<byte[], ArrayList<DomainCredentials>>> _pubKeys = new HashMap<byte[], HashMap<byte[], ArrayList<DomainCredentials>>>();
 	
 	/*TODO - implement*/
-	private byte[] searchPassword(byte[] pubKey, byte[] domain, byte[] username) throws PasswordManagerExceptionHandler{
+	public byte[] searchPassword(byte[] pubKey, byte[] domain, byte[] username) throws PasswordManagerExceptionHandler{
 		byte[] toRet = null; 
 		
 		for (DomainCredentials dc : getDomains(pubKey, domain)) {
@@ -25,7 +25,7 @@ public class Manager {
 		}
 		if(toRet != null)
 			return toRet;
-		else throw new PasswordNotFoundException();
+		else throw new CredentialsNotFoundException();
 	}
 	
 	private ArrayList<DomainCredentials> getDomains(byte[] pubKey, byte[] domain){
@@ -33,12 +33,12 @@ public class Manager {
 	}
 	
 	/*TODO - implement*/
-	public void delete(byte[] pubKey, byte[] domain, byte[] username) throws PasswordManagerExceptionHandler{
-		byte[] toDel = null;
+	public void delete(byte[] pubKey, byte[] domain, byte[] username, byte[] password) throws PasswordManagerExceptionHandler{
+		DomainCredentials toDel = null;
 		
 		for (DomainCredentials dc : getDomains(pubKey, domain)) {
-			if(dc.getUsername() == username){
-				toDel = dc.getPassword();
+			if(dc.getUsername() == username && dc.getPassword() == password){
+				toDel = dc;
 				break;
 			}
 		}
@@ -46,11 +46,11 @@ public class Manager {
 			getDomains(pubKey, domain).remove(toDel);
 			toDel = null;
 		}
-		else throw new PasswordNotFoundException();
+		else throw new CredentialsNotFoundException();
 	}
 	
 	/*TODO - implement*/
-	public void insert(byte[] pubKey, byte[] domain, byte[] username) throws PasswordManagerExceptionHandler{
+	public void insert(byte[] pubKey, byte[] domain, byte[] username, byte[] password) throws PasswordManagerExceptionHandler{
 		boolean throwed = false;
 		
 		for(DomainCredentials dm : _pubKeys.get(pubKey).get(domain)){
@@ -60,7 +60,7 @@ public class Manager {
 			}
 		}
 		if(!throwed){
-			_pubKeys.get(pubKey).get(domain).add(new DomainCredentials(username, null));
+			_pubKeys.get(pubKey).get(domain).add(new DomainCredentials(username, password));
 		}
 	} 
 	
