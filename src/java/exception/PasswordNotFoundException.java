@@ -1,5 +1,5 @@
 package exception;
-import message.*;
+import message.PasswordManagerMessages;
 
 public class PasswordNotFoundException extends PasswordManagerExceptionHandler{
 

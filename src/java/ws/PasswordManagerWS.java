@@ -2,7 +2,7 @@ package ws;
 
 import java.security.Key;
 
-import javax.jws.WebMethod;  
+import javax.jws.WebMethod;
 import javax.jws.WebService;
 
 import exception.PasswordManagerExceptionHandler;  
