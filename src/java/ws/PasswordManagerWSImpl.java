@@ -10,16 +10,37 @@ import manager.Manager;
 public class PasswordManagerWSImpl implements PasswordManagerWS {
 	Manager manager = new Manager();
 	
-	public void register(byte[] pubKey) throws PasswordManagerExceptionHandler{
-		manager.register(pubKey);
+	public String register(byte[] pubKey){
+		String toRet = "";
+		
+		try{
+			manager.register(pubKey);
+		}catch(PasswordManagerExceptionHandler pme){
+			toRet = pme.getMessage();
+		}
+		return toRet;
 	}
 
-	public void put(byte[] pubKey, byte[] domain, byte[] username, byte[] password) throws PasswordManagerExceptionHandler{
-		manager.insert(pubKey, domain, username, password);
+	public String put(byte[] pubKey, byte[] domain, byte[] username, byte[] password){
+		String toRet = "";
+		
+		try{
+			manager.insert(pubKey, domain, username, password);
+		}catch(PasswordManagerExceptionHandler pme){
+			toRet = pme.getMessage();
+		}
+		return toRet;
 	} 
 	
-	public void get(byte[] pubKey, byte[] domain, byte[] username) throws PasswordManagerExceptionHandler{
-		manager.searchPassword(pubKey, domain, username);
+	public String get(byte[] pubKey, byte[] domain, byte[] username){
+		String toRet = "";
+		
+		try{
+			manager.searchPassword(pubKey, domain, username);
+		}catch(PasswordManagerExceptionHandler pme){
+			toRet = pme.getMessage();
+		}
+		return toRet;
 	}
 		
 }
