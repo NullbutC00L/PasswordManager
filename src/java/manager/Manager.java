@@ -1,7 +1,9 @@
 package manager;
 
+import java.util.Arrays;
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.nio.ByteBuffer;
 
 import domain.DomainCredentials;
 import exception.CredentialsNotFoundException;
@@ -9,57 +11,72 @@ import exception.PasswordManagerExceptionHandler;
 import exception.PubKeyAlreadyExistsException;
 import exception.UserAlreadyOnDomainException;
 
-public class Manager {			
-	
-	private HashMap<byte[], HashMap<byte[], ArrayList<DomainCredentials>>> _pubKeys = new HashMap<byte[], HashMap<byte[], ArrayList<DomainCredentials>>>();
-	
-	private ArrayList<DomainCredentials> getDomains(byte[] pubKey, byte[] domain){
-		return _pubKeys.get(pubKey).get(domain);
+public class Manager {
+
+	private HashMap<ByteBuffer, HashMap<ByteBuffer, ArrayList<DomainCredentials>>> _pubKeys = new HashMap<ByteBuffer, HashMap<ByteBuffer, ArrayList<DomainCredentials>>>();
+
+	private HashMap<ByteBuffer, ArrayList<DomainCredentials>> getPubKey(byte[] pubKey) {
+		return _pubKeys.get(ByteBuffer.wrap(pubKey));
 	}
-	
-	public byte[] searchPassword(byte[] pubKey, byte[] domain, byte[] username) throws PasswordManagerExceptionHandler{
+
+	private void addPubKey(byte[] pubKey) {
+		_pubKeys.putIfAbsent(ByteBuffer.wrap(pubKey), new HashMap< ByteBuffer, ArrayList<DomainCredentials>>());
+	}
+
+	private ArrayList<DomainCredentials> getDomain(byte[] pubKey, byte[] domain) {
+		if ( getPubKey(pubKey) == null )
+			return null;
 		
-		for (DomainCredentials dc : getDomains(pubKey, domain)) {
-			if(dc.getUsername() == username){
+		return getPubKey(pubKey).get(ByteBuffer.wrap(domain));
+	}
+
+	private void addDomain(byte[] pubKey, byte[] domain) {
+		getPubKey(pubKey).putIfAbsent(ByteBuffer.wrap(domain), new ArrayList<DomainCredentials>());
+	}
+
+	public byte[] searchPassword(byte[] pubKey, byte[] domain, byte[] username) throws PasswordManagerExceptionHandler{
+		ArrayList<DomainCredentials> domainList = getDomain(pubKey, domain); 
+
+		if ( domainList == null )
+			throw new CredentialsNotFoundException();
+
+		for (DomainCredentials dc : domainList) {
+			if(Arrays.equals(dc.getUsername(), username)){
 				return dc.getPassword();
 			}
 		}
-		
+
 		throw new CredentialsNotFoundException();
 	}
 
 	public void delete(byte[] pubKey, byte[] domain, byte[] username, byte[] password) throws PasswordManagerExceptionHandler{
-		ArrayList<DomainCredentials> domainList = getDomains(pubKey, domain); 
-		
+		ArrayList<DomainCredentials> domainList = getDomain(pubKey, domain); 
+
 		for (DomainCredentials dc : domainList) {
-			if(dc.getUsername() == username && dc.getPassword() == password){
+			if(Arrays.equals(dc.getUsername(), username) && Arrays.equals(dc.getPassword(), password)){
 				domainList.remove(dc);
 				return;
 			}
 		}
-		
+
 		throw new CredentialsNotFoundException();
 	}
-	
+
 	public void insert(byte[] pubKey, byte[] domain, byte[] username, byte[] password) throws PasswordManagerExceptionHandler{
 		try {
 			searchPassword(pubKey, domain, username);
-			
-			// If user does not exists search throws exception 
 			throw new UserAlreadyOnDomainException();
-			
-		}catch(CredentialsNotFoundException e){
-			getDomains(pubKey, domain).add(new DomainCredentials(username, password));
+		}
+		catch(CredentialsNotFoundException e){
+			addDomain(pubKey, domain);
+			getDomain(pubKey, domain).add(new DomainCredentials(username, password));
 		}
 	} 
 
 	public void register(byte[] pubKey) throws PasswordManagerExceptionHandler{
-		
-		if(!_pubKeys.containsKey(pubKey)){
-			_pubKeys.put(pubKey, new HashMap<byte[], ArrayList<DomainCredentials>>());
-			return;
-		}
-		
-		throw new PubKeyAlreadyExistsException();	
+		if( getPubKey(pubKey) != null )
+			throw new PubKeyAlreadyExistsException();
+
+		addPubKey(pubKey);
 	} 
 }
