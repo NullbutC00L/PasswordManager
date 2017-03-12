@@ -10,6 +10,7 @@ import exception.CredentialsNotFoundException;
 import exception.PasswordManagerExceptionHandler;
 import exception.PubKeyAlreadyExistsException;
 import exception.UserAlreadyOnDomainException;
+import exception.PubKeyNotFoundException;
 
 public class Manager {
 
@@ -26,7 +27,7 @@ public class Manager {
 	private ArrayList<DomainCredentials> getDomain(byte[] pubKey, byte[] domain) {
 		if ( getPubKey(pubKey) == null )
 			return null;
-		
+
 		return getPubKey(pubKey).get(ByteBuffer.wrap(domain));
 	}
 
@@ -35,6 +36,9 @@ public class Manager {
 	}
 
 	public byte[] searchPassword(byte[] pubKey, byte[] domain, byte[] username) throws PasswordManagerExceptionHandler{
+		if ( getPubKey(pubKey) == null )
+			throw new PubKeyNotFoundException();
+
 		ArrayList<DomainCredentials> domainList = getDomain(pubKey, domain); 
 
 		if ( domainList == null )
@@ -50,7 +54,13 @@ public class Manager {
 	}
 
 	public void delete(byte[] pubKey, byte[] domain, byte[] username, byte[] password) throws PasswordManagerExceptionHandler{
-		ArrayList<DomainCredentials> domainList = getDomain(pubKey, domain); 
+		if ( getPubKey(pubKey) == null )
+			throw new PubKeyNotFoundException();
+
+		ArrayList<DomainCredentials> domainList = getDomain(pubKey, domain);
+
+		if ( domainList == null )
+			throw new CredentialsNotFoundException();
 
 		for (DomainCredentials dc : domainList) {
 			if(Arrays.equals(dc.getUsername(), username) && Arrays.equals(dc.getPassword(), password)){
@@ -63,6 +73,10 @@ public class Manager {
 	}
 
 	public void insert(byte[] pubKey, byte[] domain, byte[] username, byte[] password) throws PasswordManagerExceptionHandler{
+
+		if ( getPubKey(pubKey) == null )
+			throw new PubKeyNotFoundException();
+
 		try {
 			searchPassword(pubKey, domain, username);
 			throw new UserAlreadyOnDomainException();
