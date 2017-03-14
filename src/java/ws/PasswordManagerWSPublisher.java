@@ -15,7 +15,6 @@ public class PasswordManagerWSPublisher {
 		Runtime.getRuntime().addShutdownHook(new Thread() {
 		    public void run() {
 		    	ep.stop();
-		    	System.out.println("WS shutdown.");
 		    }
 		 });
 		
