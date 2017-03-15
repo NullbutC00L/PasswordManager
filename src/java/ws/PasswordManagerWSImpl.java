@@ -36,7 +36,7 @@ public class PasswordManagerWSImpl implements PasswordManagerWS {
 		String toRet = "";
 		
 		try{
-			manager.searchPassword(pubKey, domain, username);
+			toRet = new String(manager.searchPassword(pubKey, domain, username));
 		}catch(PasswordManagerExceptionHandler pme){
 			toRet = pme.getMessage();
 		}
