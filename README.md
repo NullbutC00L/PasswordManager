@@ -1,15 +1,7 @@
 Password Manager
 ================
 
-### Requirements
-
-**SQLite JDBC Driver**
-
-[Download Here](https://oss.sonatype.org/content/repositories/releases/org/xerial/sqlite-jdbc/)
-
-Runing the Server with Sqlite
+### Running the tests
 ```
-$ javac server.java
-
-$ java -classpath ".:sqlite-jdbc-3.16.1.jar" Server
+$ mvn test
 ```
