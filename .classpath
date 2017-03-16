@@ -25,5 +25,7 @@
 	</classpathentry>
 	<classpathentry kind="con" path="org.eclipse.jdt.junit.JUNIT_CONTAINER/4"/>
 	<classpathentry exported="true" kind="var" path="M2_REPO/junit/junit/4.11/junit-4.11.jar"/>
+	<classpathentry kind="lib" path="/Users/Fabio/Desktop/javax.jws-3.1.2.2.jar"/>
+	<classpathentry kind="lib" path="/Users/Fabio/Desktop/javax.xml.ws-3.0-prelude-embedded-m2.jar"/>
 	<classpathentry kind="output" path="target/classes"/>
 </classpath>
