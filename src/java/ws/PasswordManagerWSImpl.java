@@ -11,6 +11,7 @@ public class PasswordManagerWSImpl implements PasswordManagerWS {
 	Manager manager = new Manager();
 	
 	public String register(byte[] pubKey){
+		System.out.println("Received register command.");
 		String toRet = "";
 		
 		try{
@@ -22,6 +23,7 @@ public class PasswordManagerWSImpl implements PasswordManagerWS {
 	}
 
 	public String put(byte[] pubKey, byte[] domain, byte[] username, byte[] password){
+		System.out.println("Received put command.");
 		String toRet = "";
 		
 		try{
@@ -33,6 +35,7 @@ public class PasswordManagerWSImpl implements PasswordManagerWS {
 	} 
 	
 	public String get(byte[] pubKey, byte[] domain, byte[] username){
+		System.out.println("Received get command.");
 		String toRet = "";
 		
 		try{
