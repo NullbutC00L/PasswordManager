@@ -34,15 +34,13 @@ public class PasswordManagerWSImpl implements PasswordManagerWS {
 		return toRet;
 	} 
 	
-	public String get(byte[] pubKey, byte[] domain, byte[] username){
+	public byte[] get(byte[] pubKey, byte[] domain, byte[] username){
 		System.out.println("Received get command.");
-		String toRet = "";
+		byte[] toRet = null;
 		
 		try{
-			toRet = new String(manager.searchPassword(pubKey, domain, username));
-		}catch(PasswordManagerExceptionHandler pme){
-			toRet = pme.getMessage();
-		}
+			toRet = manager.searchPassword(pubKey, domain, username);
+		}catch(PasswordManagerExceptionHandler pme){}
 		return toRet;
 	}
 		

@@ -14,5 +14,5 @@ public interface PasswordManagerWS {
 	public String put(byte[] pubKey, byte[] domain, byte[] username, byte[] password);
 	
 	@WebMethod
-	public String get(byte[] pubKey, byte[] domain, byte[] username);
+	public byte[] get(byte[] pubKey, byte[] domain, byte[] username);
 }  
