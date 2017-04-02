@@ -1,46 +1,39 @@
 package ws;
 
-import javax.jws.WebService;
-
 import exception.PasswordManagerExceptionHandler;
 import manager.Manager;
+import crypto.Crypto;
+import envelope.Envelope;
+import envelope.Envelope.Message;
+
+import javax.jws.WebService;
 
 @SuppressWarnings("restriction")
 @WebService(endpointInterface="ws.PasswordManagerWS")
 public class PasswordManagerWSImpl implements PasswordManagerWS {
-	Manager manager = new Manager();
-	
-	public String register(byte[] pubKey){
-		System.out.println("Received register command.");
-		String toRet = "";
-		
-		try{
-			manager.register(pubKey);
-		}catch(PasswordManagerExceptionHandler pme){
-			toRet = pme.getMessage();
-		}
-		return toRet;
-	}
+  Manager manager = new Manager();
 
-	public String put(byte[] pubKey, byte[] domain, byte[] username, byte[] password){
-		System.out.println("Received put command.");
-		String toRet = "";
-		
-		try{
-			manager.insert(pubKey, domain, username, password);
-		}catch(PasswordManagerExceptionHandler pme){
-			toRet = pme.getMessage();
-		}
-		return toRet;
-	} 
-	
-	public byte[] get(byte[] pubKey, byte[] domain, byte[] username){
-		System.out.println("Received get command.");
-		try{
-			return manager.searchPassword(pubKey, domain, username);
-		}catch(PasswordManagerExceptionHandler pme){
-			return pme.getMessage().getBytes();
-		}
-	}
-		
+  public void register( Envelope envelope ) throws PasswordManagerExceptionHandler {
+    System.out.println("Received register command.");
+    // TODO: Do crypto evaluations
+
+    Message msg = envelope.message;
+    manager.register(msg.publicKey);
+  }
+
+  public void put( Envelope envelope ) throws PasswordManagerExceptionHandler {
+    System.out.println("Received put command.");
+    // TODO: Do crypto evaluations
+
+    Message msg = envelope.message;
+    manager.insert(msg.publicKey, msg.domainHash, msg.usernameHash, msg.password);
+  } 
+
+  public byte[] get( Envelope envelope ) throws PasswordManagerExceptionHandler {
+    System.out.println("Received get command.");
+    // TODO: Do crypto evaluations
+    
+    Message msg = envelope.message;
+    return manager.searchPassword(msg.publicKey, msg.domainHash, msg.usernameHash);
+  }
 }

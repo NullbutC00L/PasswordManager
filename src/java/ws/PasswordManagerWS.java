@@ -1,18 +1,20 @@
 package ws;
 
-import javax.jws.WebMethod;
-import javax.jws.WebService;  
+import envelope.Envelope;
+import exception.PasswordManagerExceptionHandler;
 
-@SuppressWarnings("restriction")
+import javax.jws.WebMethod;
+import javax.jws.WebService;
+
 @WebService  
 public interface PasswordManagerWS {  
   
 	@WebMethod
-	public String register(byte[] pubKey);
+	public void register( Envelope envelope ) throws PasswordManagerExceptionHandler;
 	
 	@WebMethod
-	public String put(byte[] pubKey, byte[] domain, byte[] username, byte[] password);
+	public void put( Envelope envelope ) throws PasswordManagerExceptionHandler;
 	
 	@WebMethod
-	public byte[] get(byte[] pubKey, byte[] domain, byte[] username);
+	public byte[] get( Envelope envelope ) throws PasswordManagerExceptionHandler;
 }  
