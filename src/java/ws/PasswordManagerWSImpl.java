@@ -1,12 +1,11 @@
 package ws;
 
-import exception.PasswordManagerExceptionHandler;
-import manager.Manager;
-import crypto.Crypto;
+import javax.jws.WebService;
+
 import envelope.Envelope;
 import envelope.Envelope.Message;
-
-import javax.jws.WebService;
+import exception.PasswordManagerExceptionHandler;
+import manager.Manager;
 
 @SuppressWarnings("restriction")
 @WebService(endpointInterface="ws.PasswordManagerWS")

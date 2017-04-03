@@ -3,14 +3,11 @@ package manager;
 import java.io.FileInputStream;
 import java.security.Key;
 import java.security.KeyPair;
-import java.security.KeyPairGenerator;
 import java.security.KeyStore;
 import java.security.PrivateKey;
 import java.security.PublicKey;
 import java.security.cert.Certificate;
 import java.security.cert.X509Certificate;
-import java.util.*;
-import javax.crypto.Cipher;
 
 public class Cript{
 	

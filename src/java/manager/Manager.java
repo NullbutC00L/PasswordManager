@@ -1,18 +1,17 @@
 package manager;
 
-import java.util.Arrays;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.Random;
 import java.nio.ByteBuffer;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.HashMap;
 
 import domain.DomainCredentials;
+import exception.CounterIncorrectException;
 import exception.CredentialsNotFoundException;
 import exception.PasswordManagerExceptionHandler;
 import exception.PubKeyAlreadyExistsException;
-import exception.UserAlreadyOnDomainException;
 import exception.PubKeyNotFoundException;
-import exception.CounterIncorrectException;
+import exception.UserAlreadyOnDomainException;
 
 public class Manager {
 

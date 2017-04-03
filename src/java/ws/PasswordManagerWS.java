@@ -1,10 +1,10 @@
 package ws;
 
-import envelope.Envelope;
-import exception.PasswordManagerExceptionHandler;
-
 import javax.jws.WebMethod;
 import javax.jws.WebService;
+
+import envelope.Envelope;
+import exception.PasswordManagerExceptionHandler;
 
 @WebService  
 public interface PasswordManagerWS {  

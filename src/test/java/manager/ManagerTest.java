@@ -1,13 +1,13 @@
 package manager;
 
+import static org.junit.Assert.assertArrayEquals;
+
+import org.junit.Test;
+
 import exception.CredentialsNotFoundException;
 import exception.PubKeyAlreadyExistsException;
 import exception.PubKeyNotFoundException;
 import exception.UserAlreadyOnDomainException;
-
-import static org.junit.Assert.*;
-
-import org.junit.Test;
 
 public class ManagerTest {
   private Manager _manager = new Manager();
