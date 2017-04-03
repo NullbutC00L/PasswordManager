@@ -12,6 +12,7 @@ import exception.PasswordManagerExceptionHandler;
 import exception.PubKeyAlreadyExistsException;
 import exception.UserAlreadyOnDomainException;
 import exception.PubKeyNotFoundException;
+import exception.CounterIncorrectException;
 
 public class Manager {
 
@@ -105,6 +106,17 @@ public class Manager {
 		else{
 			counters.put(Mac_address,value);
 			return value;
+		}
+	
+		
+	}
+	public int counter_checker(String Mac_address,int counter)throws CounterIncorrectException{
+		if(counter>counters.get(Mac_address)){
+			counters.put(Mac_address, counter+1);
+			return counter+1;
+		}
+		else{
+			throw CounterIncorrectException("counter is not well");
 		}
 	}
 
