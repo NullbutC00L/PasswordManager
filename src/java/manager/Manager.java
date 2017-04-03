@@ -110,14 +110,14 @@ public class Manager {
 	
 		
 	}
-	public int counter_checker(String Mac_address,int counter)throws CounterIncorrectException{
+	public int counter_checker(String Mac_address,int counter) throws CounterIncorrectException{
 		if(counter>counters.get(Mac_address)){
 			counters.put(Mac_address, counter+1);
 			return counter+1;
 		}
-		else{
-			throw CounterIncorrectException("counter is not well");
-		}
+		
+		throw new CounterIncorrectException();
+		
 	}
 
 }
