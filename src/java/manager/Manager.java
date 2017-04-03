@@ -3,6 +3,7 @@ package manager;
 import java.util.Arrays;
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.Random;
 import java.nio.ByteBuffer;
 
 import domain.DomainCredentials;
@@ -15,7 +16,7 @@ import exception.PubKeyNotFoundException;
 public class Manager {
 
 	private HashMap<ByteBuffer, HashMap<ByteBuffer, ArrayList<DomainCredentials>>> _pubKeys = new HashMap<ByteBuffer, HashMap<ByteBuffer, ArrayList<DomainCredentials>>>();
-
+	private HashMap<String,Integer > counters = new HashMap<String, Integer>();
 	private HashMap<ByteBuffer, ArrayList<DomainCredentials>> getPubKey(byte[] pubKey) {
 		return _pubKeys.get(ByteBuffer.wrap(pubKey));
 	}
@@ -93,4 +94,18 @@ public class Manager {
 
 		addPubKey(pubKey);
 	} 
+	public int counter(String Mac_address){
+		
+
+		int  value = (int )(Math.random() * 10000);;
+		
+		if(counters.containsKey(Mac_address)){
+			return counters.get(Mac_address);
+		}
+		else{
+			counters.put(Mac_address,value);
+			return value;
+		}
+	}
+
 }
