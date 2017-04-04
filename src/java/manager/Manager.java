@@ -4,6 +4,7 @@ import java.nio.ByteBuffer;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
+import java.nio.ByteBuffer;
 
 import domain.DomainCredentials;
 import exception.CounterIncorrectException;
@@ -17,6 +18,7 @@ public class Manager {
 
 	private HashMap<ByteBuffer, HashMap<ByteBuffer, ArrayList<DomainCredentials>>> _pubKeys = new HashMap<ByteBuffer, HashMap<ByteBuffer, ArrayList<DomainCredentials>>>();
 	private HashMap<String,Integer > counters = new HashMap<String, Integer>();
+
 	private HashMap<ByteBuffer, ArrayList<DomainCredentials>> getPubKey(byte[] pubKey) {
 		return _pubKeys.get(ByteBuffer.wrap(pubKey));
 	}
@@ -36,7 +38,7 @@ public class Manager {
 		getPubKey(pubKey).putIfAbsent(ByteBuffer.wrap(domain), new ArrayList<DomainCredentials>());
 	}
 
-	public byte[] searchPassword(byte[] pubKey, byte[] domain, byte[] username) throws PasswordManagerExceptionHandler{
+	public byte[][] searchPassword(byte[] pubKey, byte[] domain, byte[] username) throws PasswordManagerExceptionHandler{
 		if ( getPubKey(pubKey) == null )
 			throw new PubKeyNotFoundException();
 
@@ -47,33 +49,15 @@ public class Manager {
 
 		for (DomainCredentials dc : domainList) {
 			if(Arrays.equals(dc.getUsername(), username)){
-				return dc.getPassword();
+				return new byte[][] { dc.getPassword(), dc.getTripletHash() };
 			}
 		}
 
 		throw new CredentialsNotFoundException();
 	}
 
-	public void delete(byte[] pubKey, byte[] domain, byte[] username, byte[] password) throws PasswordManagerExceptionHandler{
-		if ( getPubKey(pubKey) == null )
-			throw new PubKeyNotFoundException();
 
-		ArrayList<DomainCredentials> domainList = getDomain(pubKey, domain);
-
-		if ( domainList == null )
-			throw new CredentialsNotFoundException();
-
-		for (DomainCredentials dc : domainList) {
-			if(Arrays.equals(dc.getUsername(), username) && Arrays.equals(dc.getPassword(), password)){
-				domainList.remove(dc);
-				return;
-			}
-		}
-
-		throw new CredentialsNotFoundException();
-	}
-
-	public void insert(byte[] pubKey, byte[] domain, byte[] username, byte[] password) throws PasswordManagerExceptionHandler{
+	public void insert(byte[] pubKey, byte[] domain, byte[] username, byte[] password, byte[] tripletHash) throws PasswordManagerExceptionHandler{
 
 		if ( getPubKey(pubKey) == null )
 			throw new PubKeyNotFoundException();
@@ -84,7 +68,7 @@ public class Manager {
 		}
 		catch(CredentialsNotFoundException e){
 			addDomain(pubKey, domain);
-			getDomain(pubKey, domain).add(new DomainCredentials(username, password));
+			getDomain(pubKey, domain).add(new DomainCredentials(username, password, tripletHash));
 		}
 	} 
 
@@ -106,7 +90,6 @@ public class Manager {
 			counters.put(Mac_address,value);
 			return value;
 		}
-	
 		
 	}
 	public int counter_checker(String Mac_address,int counter) throws CounterIncorrectException{
@@ -119,4 +102,22 @@ public class Manager {
 		
 	}
 
+	//public void delete(byte[] pubKey, byte[] domain, byte[] username, byte[] password) throws PasswordManagerExceptionHandler{
+		//if ( getPubKey(pubKey) == null )
+			//throw new PubKeyNotFoundException();
+
+		//ArrayList<DomainCredentials> domainList = getDomain(pubKey, domain);
+
+		//if ( domainList == null )
+			//throw new CredentialsNotFoundException();
+
+		//for (DomainCredentials dc : domainList) {
+			//if(Arrays.equals(dc.getUsername(), username) && Arrays.equals(dc.getPassword(), password)){
+				//domainList.remove(dc);
+				//return;
+			//}
+		//}
+
+		//throw new CredentialsNotFoundException();
+	//}
 }

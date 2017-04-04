@@ -10,11 +10,11 @@ import exception.PasswordManagerExceptionHandler;
 public interface PasswordManagerWS {  
   
 	@WebMethod
-	public void register( Envelope envelope ) throws PasswordManagerExceptionHandler;
+	public Envelope register( Envelope envelope ) throws PasswordManagerExceptionHandler;
 	
 	@WebMethod
-	public void put( Envelope envelope ) throws PasswordManagerExceptionHandler;
+	public Envelope put( Envelope envelope ) throws PasswordManagerExceptionHandler;
 	
 	@WebMethod
-	public byte[] get( Envelope envelope ) throws PasswordManagerExceptionHandler;
+	public Envelope get( Envelope envelope ) throws PasswordManagerExceptionHandler;
 }  
