@@ -2,17 +2,18 @@ package ws;
 
 import javax.jws.WebService;
 
-import envelope.Envelope;
-import envelope.Message;
+import envelope.*;
+import crypto.Crypto;
+import util.Util;
 import exception.PasswordManagerExceptionHandler;
 import manager.Manager;
-import crypto.Crypto;
 
 @SuppressWarnings("restriction")
 @WebService(endpointInterface="ws.PasswordManagerWS")
 public class PasswordManagerWSImpl implements PasswordManagerWS {
   Manager manager = new Manager();
   private Crypto crypto = PasswordManagerWSPublisher.CRYPTO;
+  private Util util = new Util();
 
   public Envelope register( Envelope envelope ) throws PasswordManagerExceptionHandler {
     System.out.println("Received register command.");
@@ -30,7 +31,7 @@ public class PasswordManagerWSImpl implements PasswordManagerWS {
     Envelope renvelope = new Envelope();
     renvelope.setMessage( rmsg );
     // Add HMAC
-    renvelope.setHMAC( crypto.genMac(renvelope.serialize(), crypto.getSecretKey()));
+    renvelope.setHMAC( crypto.genMac(util.msgToByteArray(rmsg), crypto.getSecretKey()));
 
     return renvelope;
   }
@@ -52,7 +53,7 @@ public class PasswordManagerWSImpl implements PasswordManagerWS {
     renvelope.setMessage( rmsg );
 
     // Add HMAC
-    renvelope.setHMAC( crypto.genMac(renvelope.serialize(), crypto.getSecretKey()));
+    renvelope.setHMAC( crypto.genMac(util.msgToByteArray(rmsg), crypto.getSecretKey()));
 
     return renvelope;
   } 
@@ -76,7 +77,7 @@ public class PasswordManagerWSImpl implements PasswordManagerWS {
     renvelope.setMessage( rmsg );
 
     // Add HMAC
-    renvelope.setHMAC( crypto.genMac(renvelope.serialize(), crypto.getSecretKey()));
+    renvelope.setHMAC( crypto.genMac(util.msgToByteArray(rmsg), crypto.getSecretKey()));
 
     return renvelope;
   }
