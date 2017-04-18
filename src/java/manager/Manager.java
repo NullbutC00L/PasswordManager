@@ -4,7 +4,6 @@ import java.nio.ByteBuffer;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
-import java.nio.ByteBuffer;
 
 import domain.DomainCredentials;
 import exception.CounterIncorrectException;
