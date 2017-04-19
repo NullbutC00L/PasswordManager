@@ -8,7 +8,6 @@ import util.Util;
 import exception.PasswordManagerExceptionHandler;
 import manager.Manager;
 
-@SuppressWarnings("restriction")
 @WebService(endpointInterface="ws.PasswordManagerWS")
 public class PasswordManagerWSImpl implements PasswordManagerWS {
   Manager manager = new Manager();

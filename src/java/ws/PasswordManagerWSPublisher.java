@@ -5,7 +5,6 @@ import javax.xml.ws.Endpoint;
 import message.PasswordManagerMessages;
 import crypto.Crypto;
 
-@SuppressWarnings("restriction")
 public class PasswordManagerWSPublisher {
 
   protected static Crypto CRYPTO = new Crypto();
