@@ -18,7 +18,7 @@ public class PasswordManagerWSImpl implements PasswordManagerWS {
     System.out.println("Received register command.");
     // TODO: Do crypto evaluations
 
-    Message msg = envelope.getMessage();
+    Message msg = envelope.message;
     manager.register(msg.publicKey);
 
     Message rmsg = new Message();
@@ -39,7 +39,7 @@ public class PasswordManagerWSImpl implements PasswordManagerWS {
     System.out.println("Received put command.");
     // TODO: Do crypto evaluations
 
-    Message msg = envelope.getMessage();
+    Message msg = envelope.message;
     manager.insert(msg.publicKey, msg.domainHash, msg.usernameHash, msg.password, msg.tripletHash);
 
     Message rmsg = new Message();
@@ -61,7 +61,7 @@ public class PasswordManagerWSImpl implements PasswordManagerWS {
     System.out.println("Received get command.");
     // TODO: Do crypto evaluations
 
-    Message msg = envelope.getMessage();
+    Message msg = envelope.message;
     byte[][] response = manager.searchPassword(msg.publicKey, msg.domainHash, msg.usernameHash);
 
     Message rmsg = new Message();
