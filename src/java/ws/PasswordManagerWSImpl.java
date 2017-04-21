@@ -2,6 +2,7 @@ package ws;
 
 import javax.jws.WebService;
 import java.util.Arrays;
+import javax.crypto.SecretKey;
 
 import envelope.Envelope;
 import envelope.Message;
@@ -22,12 +23,8 @@ public class PasswordManagerWSImpl implements PasswordManagerWS {
     Message msg = envelope.getMessage();
 
     // Do crypto evaluations
-    byte[] HMAC = crypto.genMac(
-        util.msgToByteArray( msg ),
-        crypto.getSecretKey());
-    if (!Arrays.equals(HMAC, envelope.getHMAC())){
-      System.out.println("Integrity of the message not verified");
-    }
+    if ( !verifyHMAC(envelope) )
+        System.out.println("HMACs don't match");
     // TODO: Counter
 
     manager.register(msg.publicKey);
@@ -39,6 +36,7 @@ public class PasswordManagerWSImpl implements PasswordManagerWS {
     // TODO: Add Counter
     renvelope.setMessage( rmsg );
     renvelope.setHMAC( crypto.genMac(util.msgToByteArray(rmsg), crypto.getSecretKey()));
+    renvelope.setDHPublicKey( crypto.getDHPublicKey() );
 
     return renvelope;
   }
@@ -49,12 +47,8 @@ public class PasswordManagerWSImpl implements PasswordManagerWS {
     Message msg = envelope.getMessage();
 
     // Do crypto evaluations
-    byte[] HMAC = crypto.genMac(
-        util.msgToByteArray( msg ),
-        crypto.getSecretKey());
-    if (!Arrays.equals(HMAC, envelope.getHMAC())){
-      System.out.println("Integrity of the message not verified");
-    }
+    if ( !verifyHMAC(envelope) )
+        System.out.println("HMACs don't match");
     // TODO: Counter
 
     manager.insert(msg.publicKey, msg.domainHash, msg.usernameHash, msg.password, msg.tripletHash);
@@ -66,6 +60,7 @@ public class PasswordManagerWSImpl implements PasswordManagerWS {
     // TODO: Add Counter
     renvelope.setMessage( rmsg );
     renvelope.setHMAC( crypto.genMac(util.msgToByteArray(rmsg), crypto.getSecretKey()));
+    renvelope.setDHPublicKey( crypto.getDHPublicKey() );
 
     return renvelope;
   } 
@@ -76,12 +71,8 @@ public class PasswordManagerWSImpl implements PasswordManagerWS {
     Message msg = envelope.getMessage();
 
     // Do crypto evaluations
-    byte[] HMAC = crypto.genMac(
-        util.msgToByteArray( msg ),
-        crypto.getSecretKey());
-    if (!Arrays.equals(HMAC, envelope.getHMAC())){
-      System.out.println("Integrity of the message not verified");
-    }
+    if ( !verifyHMAC(envelope) )
+        System.out.println("HMACs don't match");
     // TODO: Counter
 
     byte[][] response = manager.searchPassword(msg.publicKey, msg.domainHash, msg.usernameHash);
@@ -96,7 +87,15 @@ public class PasswordManagerWSImpl implements PasswordManagerWS {
     // TODO: Add Counter
     renvelope.setMessage( rmsg );
     renvelope.setHMAC( crypto.genMac(util.msgToByteArray(rmsg), crypto.getSecretKey()));
+    renvelope.setDHPublicKey( crypto.getDHPublicKey() );
 
     return renvelope;
+  }
+
+  private boolean verifyHMAC( Envelope envelope) {
+    SecretKey DHPubKeyCli = crypto.retrieveDHPubKey(envelope.getDHPublicKey());
+    SecretKey DHSecretKey = crypto.generateDH( crypto.getDHPrivateKey(), DHPubKeyCli );
+    byte[] HMAC = crypto.genMac( util.msgToByteArray( envelope.getMessage() ), DHSecretKey );
+    return Arrays.equals(HMAC, envelope.getHMAC());
   }
 }
