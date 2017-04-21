@@ -1,8 +1,10 @@
 package ws;
 
 import javax.jws.WebService;
+import java.util.Arrays;
 
-import envelope.*;
+import envelope.Envelope;
+import envelope.Message;
 import crypto.Crypto;
 import util.Util;
 import exception.PasswordManagerExceptionHandler;
@@ -16,20 +18,26 @@ public class PasswordManagerWSImpl implements PasswordManagerWS {
 
   public Envelope register( Envelope envelope ) throws PasswordManagerExceptionHandler {
     System.out.println("Received register command.");
-    // TODO: Do crypto evaluations
 
-    Message msg = envelope.message;
+    Message msg = envelope.getMessage();
+
+    // Do crypto evaluations
+    byte[] HMAC = crypto.genMac(
+        util.msgToByteArray( msg ),
+        crypto.getSecretKey());
+    if (!Arrays.equals(HMAC, envelope.getHMAC())){
+      System.out.println("Integrity of the message not verified");
+    }
+    // TODO: Counter
+
     manager.register(msg.publicKey);
 
-    Message rmsg = new Message();
-    // TODO: Add crypto primitives
-
-    // Add Counter
-    // TODO: this
-
     Envelope renvelope = new Envelope();
+    Message rmsg = new Message();
+
+    // Add crypto primitives
+    // TODO: Add Counter
     renvelope.setMessage( rmsg );
-    // Add HMAC
     renvelope.setHMAC( crypto.genMac(util.msgToByteArray(rmsg), crypto.getSecretKey()));
 
     return renvelope;
@@ -37,21 +45,26 @@ public class PasswordManagerWSImpl implements PasswordManagerWS {
 
   public Envelope put( Envelope envelope ) throws PasswordManagerExceptionHandler {
     System.out.println("Received put command.");
-    // TODO: Do crypto evaluations
 
-    Message msg = envelope.message;
+    Message msg = envelope.getMessage();
+
+    // Do crypto evaluations
+    byte[] HMAC = crypto.genMac(
+        util.msgToByteArray( msg ),
+        crypto.getSecretKey());
+    if (!Arrays.equals(HMAC, envelope.getHMAC())){
+      System.out.println("Integrity of the message not verified");
+    }
+    // TODO: Counter
+
     manager.insert(msg.publicKey, msg.domainHash, msg.usernameHash, msg.password, msg.tripletHash);
 
-    Message rmsg = new Message();
-    // TODO: Add crypto primitives
-
-    // Add Counter
-    // TODO: this
-
     Envelope renvelope = new Envelope();
-    renvelope.setMessage( rmsg );
+    Message rmsg = new Message();
 
-    // Add HMAC
+    // Add crypto primitives
+    // TODO: Add Counter
+    renvelope.setMessage( rmsg );
     renvelope.setHMAC( crypto.genMac(util.msgToByteArray(rmsg), crypto.getSecretKey()));
 
     return renvelope;
@@ -59,23 +72,29 @@ public class PasswordManagerWSImpl implements PasswordManagerWS {
 
   public Envelope get( Envelope envelope ) throws PasswordManagerExceptionHandler {
     System.out.println("Received get command.");
-    // TODO: Do crypto evaluations
 
-    Message msg = envelope.message;
+    Message msg = envelope.getMessage();
+
+    // Do crypto evaluations
+    byte[] HMAC = crypto.genMac(
+        util.msgToByteArray( msg ),
+        crypto.getSecretKey());
+    if (!Arrays.equals(HMAC, envelope.getHMAC())){
+      System.out.println("Integrity of the message not verified");
+    }
+    // TODO: Counter
+
     byte[][] response = manager.searchPassword(msg.publicKey, msg.domainHash, msg.usernameHash);
 
+    Envelope renvelope = new Envelope();
     Message rmsg = new Message();
+
     rmsg.setPassword( response[0] );
     rmsg.setTripletHash( response[1] );
-    // TODO: Add crypto primitives
 
-    // Add Counter
-    // TODO: this
-
-    Envelope renvelope = new Envelope();
+    // Add crypto primitives
+    // TODO: Add Counter
     renvelope.setMessage( rmsg );
-
-    // Add HMAC
     renvelope.setHMAC( crypto.genMac(util.msgToByteArray(rmsg), crypto.getSecretKey()));
 
     return renvelope;
