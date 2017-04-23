@@ -8,7 +8,7 @@ import java.util.HashMap;
 import domain.DomainCredentials;
 import exception.CounterIncorrectException;
 import exception.CredentialsNotFoundException;
-import exception.PasswordManagerExceptionHandler;
+import exception.PasswordManagerException;
 import exception.PubKeyAlreadyExistsException;
 import exception.PubKeyNotFoundException;
 import exception.UserAlreadyOnDomainException;
@@ -37,7 +37,7 @@ public class Manager {
 		getPubKey(pubKey).putIfAbsent(ByteBuffer.wrap(domain), new ArrayList<DomainCredentials>());
 	}
 
-	public byte[][] searchPassword(byte[] pubKey, byte[] domain, byte[] username) throws PasswordManagerExceptionHandler{
+	public byte[][] searchPassword(byte[] pubKey, byte[] domain, byte[] username) throws PasswordManagerException{
 		if ( getPubKey(pubKey) == null )
 			throw new PubKeyNotFoundException();
 
@@ -56,7 +56,7 @@ public class Manager {
 	}
 
 
-	public void insert(byte[] pubKey, byte[] domain, byte[] username, byte[] password, byte[] tripletHash) throws PasswordManagerExceptionHandler{
+	public void insert(byte[] pubKey, byte[] domain, byte[] username, byte[] password, byte[] tripletHash) throws PasswordManagerException{
 
 		if ( getPubKey(pubKey) == null )
 			throw new PubKeyNotFoundException();
@@ -71,7 +71,7 @@ public class Manager {
 		}
 	} 
 
-	public void register(byte[] pubKey) throws PasswordManagerExceptionHandler{
+	public void register(byte[] pubKey) throws PasswordManagerException{
 		if( getPubKey(pubKey) != null )
 			throw new PubKeyAlreadyExistsException();
 
@@ -101,7 +101,7 @@ public class Manager {
 		
 	}
 
-	//public void delete(byte[] pubKey, byte[] domain, byte[] username, byte[] password) throws PasswordManagerExceptionHandler{
+	//public void delete(byte[] pubKey, byte[] domain, byte[] username, byte[] password) throws PasswordManagerException{
 		//if ( getPubKey(pubKey) == null )
 			//throw new PubKeyNotFoundException();
 
