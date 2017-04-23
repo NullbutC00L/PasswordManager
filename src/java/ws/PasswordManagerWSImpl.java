@@ -9,7 +9,7 @@ import envelope.Envelope;
 import envelope.Message;
 import crypto.Crypto;
 import util.Util;
-import exception.PasswordManagerExceptionHandler;
+import exception.PasswordManagerException;
 import manager.Manager;
 
 @WebService(endpointInterface="ws.PasswordManagerWS")
@@ -18,14 +18,20 @@ public class PasswordManagerWSImpl implements PasswordManagerWS {
   Manager manager = new Manager();
   private Crypto crypto = PasswordManagerWSPublisher.CRYPTO;
   private Util util = new Util();
+  private SecretKeyStore dhKeyStore = new SecretKeyStore();
 
   // ##################
   // #### REGISTER ####
   // ##################
-  public Envelope register( Envelope envelope ) throws PasswordManagerExceptionHandler {
+  public Envelope register( Envelope envelope ) throws PasswordManagerException {
     System.out.println("Received register command.");
+
     // Do crypto evaluations
-    verifyEnvelope( envelope );
+    if( !verifyEnvelope( envelope )) {
+      System.out.println("Security verifications failed.");
+      // TODO: let client know something bad happend
+    }
+    System.out.println("Security verifications passed.");
 
     manager.register( envelope.getMessage().publicKey );
 
@@ -36,36 +42,35 @@ public class PasswordManagerWSImpl implements PasswordManagerWS {
     renvelope.setMessage( rmsg );
 
     // Add crypto primitives
-    prepareEnvelope( renvelope );
+    prepareEnvelope( renvelope, envelope.getDHPublicKey() );
+
     return renvelope;
   }
 
   // ##################
   // ###### GET #######
   // ##################
-  public Envelope get( Envelope envelope ) throws PasswordManagerExceptionHandler {
+  public Envelope get( Envelope envelope ) throws PasswordManagerException {
     System.out.println("Received get command.");
 
-    Message msg = envelope.getMessage();
-
     // Do crypto evaluations
-    if ( !verifyHMAC(envelope) )
-        System.out.println("HMACs don't match");
-    // TODO: Counter
+    if( !verifyEnvelope( envelope )) {
+      System.out.println("Security verifications failed.");
+      // TODO: let client know something bad happend
+    }
+    System.out.println("Security verifications passed.");
 
+    Message msg = envelope.getMessage();
     byte[][] response = manager.searchPassword(msg.publicKey, msg.domainHash, msg.usernameHash);
 
     Envelope renvelope = new Envelope();
     Message rmsg = new Message();
-
     rmsg.setPassword( response[0] );
     rmsg.setTripletHash( response[1] );
+    renvelope.setMessage( rmsg );
 
     // Add crypto primitives
-    // TODO: Add Counter
-    renvelope.setMessage( rmsg );
-    renvelope.setHMAC( crypto.genMac(util.msgToByteArray(rmsg), crypto.getSecretKey()));
-    renvelope.setDHPublicKey( crypto.getDHPublicKey() );
+    prepareEnvelope( renvelope, envelope.getDHPublicKey() );
 
     return renvelope;
   }
@@ -73,54 +78,60 @@ public class PasswordManagerWSImpl implements PasswordManagerWS {
   // ##################
   // ###### PUT #######
   // ##################
-  public Envelope put( Envelope envelope ) throws PasswordManagerExceptionHandler {
+  public Envelope put( Envelope envelope ) throws PasswordManagerException {
     System.out.println("Received put command.");
 
-    Message msg = envelope.getMessage();
-
     // Do crypto evaluations
-    if ( !verifyHMAC(envelope) )
-        System.out.println("HMACs don't match");
-    // TODO: Counter
+    if( !verifyEnvelope( envelope )) {
+      System.out.println("Security verifications failed.");
+      // TODO: let client know something bad happend
+    }
+    System.out.println("Security verifications passed.");
 
+    Message msg = envelope.getMessage();
     manager.insert(msg.publicKey, msg.domainHash, msg.usernameHash, msg.password, msg.tripletHash);
 
     Envelope renvelope = new Envelope();
     Message rmsg = new Message();
+    renvelope.setMessage( rmsg );
 
     // Add crypto primitives
-    // TODO: Add Counter
-    renvelope.setMessage( rmsg );
-    renvelope.setHMAC( crypto.genMac(util.msgToByteArray(rmsg), crypto.getSecretKey()));
-    renvelope.setDHPublicKey( crypto.getDHPublicKey() );
+    // Add crypto primitives
+    prepareEnvelope( renvelope, envelope.getDHPublicKey() );
 
     return renvelope;
   } 
 
   private boolean verifyHMAC( Envelope envelope) {
-    PublicKey DHPubKeyCli = crypto.retrieveDHPubKey(envelope.getDHPublicKey());
-    SecretKey DHSecretKey = crypto.generateDH( crypto.getDHPrivateKey(), DHPubKeyCli );
+    SecretKey DHSecretKey = dhKeyStore.get( envelope.getDHPublicKey() );
     byte[] HMAC = crypto.genMac( util.msgToByteArray( envelope.getMessage() ), DHSecretKey );
     return Arrays.equals(HMAC, envelope.getHMAC());
   }
 
-  private void addHMAC( Envelope envelope ) {
-    PublicKey DHPubKeyCli = crypto.retrieveDHPubKey( envelope.getDHPublicKey() );
-    SecretKey DHSecretKey = crypto.generateDH( crypto.getDHPrivateKey(), DHPubKeyCli );
-    byte[] MAC = crypto.genMac( util.msgToByteArray(envelope.getMessage()), DHSecretKey );
-    envelope.setHMAC( MAC );
+  private void addHMAC( Envelope envelope, byte[] DHPubKeyCli ) {
+    SecretKey DHSecretKey = dhKeyStore.get( DHPubKeyCli );
+    byte[] HMAC = crypto.genMac( util.msgToByteArray(envelope.getMessage()), DHSecretKey );
+    envelope.setHMAC( HMAC );
     return;
   }
-  
-  private void prepareEnvelope( Envelope envelope ) {
-    envelope.setDHPublicKey( crypto.getDHPublicKey() );
-    addHMAC( envelope );
+
+  private void prepareEnvelope( Envelope envelope, byte[] DHPubKeyCli ) {
+    addHMAC( envelope, DHPubKeyCli );
     // TODO: counter
+    envelope.setDHPublicKey( crypto.getDHPublicKey().getEncoded() );
     return;
   }
 
   private boolean verifyEnvelope( Envelope envelope ) {
+    generateDH( envelope );
     // TODO: Counter
     return verifyHMAC( envelope ); // && verifyCounter( envelope );
+  }
+
+  private void generateDH( Envelope envelope){
+    PublicKey DHPubKeyCli = crypto.retrieveDHPubKey( envelope.getDHPublicKey() );
+    SecretKey DHSecretKey = crypto.generateDH( crypto.getDHPrivateKey(), DHPubKeyCli );
+    // Store key to save CPU
+    dhKeyStore.put( envelope.getDHPublicKey(), DHSecretKey);
   }
 }
