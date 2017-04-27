@@ -4,7 +4,8 @@ import javax.jws.WebMethod;
 import javax.jws.WebService;
 
 import envelope.Envelope;
-import exception.*;
+import exception.PasswordManagerException;
+import exception.PubKeyAlreadyExistsException;
 
 @WebService  
 public interface PasswordManagerWS {  
