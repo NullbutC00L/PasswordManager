@@ -77,30 +77,42 @@ public class Manager {
 
 		addPubKey(pubKey);
 	} 
-	public int counter(String Mac_address){
-		
 
-		int  value = (int )(Math.random() * 10000);;
-		
-		if(counters.containsKey(Mac_address)){
-			return counters.get(Mac_address);
+	public boolean checkCounter(String pub,int clientCounter){
+		if(counters.containsKey(pub)){
+			if(counters.get(pub)<clientCounter){
+			counters.put(pub,clientCounter+1);// update counter value after checking it
+			return true;
+			}else{
+			//throw new CounterIncorrectException();
+				return false;
+			}
 		}
-		else{
-			counters.put(Mac_address,value);
+
+			initCounter(pub);
+			return true;
+		
+	}
+	
+	public int incrementCounter(int counter){
+		return counter+1;
+	}
+	
+	public int initCounter(String pub){
+		if(!counters.containsKey(pub)){
+			int  value = (int )(Math.random() * 10000);
+			counters.put(pub, value);
 			return value;
 		}
-		
-	}
-	public int counter_checker(String Mac_address,int counter) throws CounterIncorrectException{
-		if(counter>counters.get(Mac_address)){
-			counters.put(Mac_address, counter+1);
-			return counter+1;
+		else{
+			return counters.get(pub);
+			//throw exception?
+			
 		}
-		
-		throw new CounterIncorrectException();
-		
+		}
+	public int getCounter(String pub){
+		return counters.get(pub);
 	}
-
 	//public void delete(byte[] pubKey, byte[] domain, byte[] username, byte[] password) throws PasswordManagerException{
 		//if ( getPubKey(pubKey) == null )
 			//throw new PubKeyNotFoundException();
