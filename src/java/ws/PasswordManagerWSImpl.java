@@ -1,16 +1,18 @@
 package ws;
 
-import javax.jws.WebService;
-import java.util.Arrays;
-import javax.crypto.SecretKey;
 import java.security.PublicKey;
+import java.util.Arrays;
 
+import javax.crypto.SecretKey;
+import javax.jws.WebService;
+
+import crypto.Crypto;
 import envelope.Envelope;
 import envelope.Message;
-import crypto.Crypto;
-import util.Util;
 import exception.PasswordManagerException;
+import exception.SecurityVerificationException;
 import manager.Manager;
+import util.Util;
 
 @WebService(endpointInterface="ws.PasswordManagerWS")
 public class PasswordManagerWSImpl implements PasswordManagerWS {
@@ -28,8 +30,7 @@ public class PasswordManagerWSImpl implements PasswordManagerWS {
 
     // Do crypto evaluations
     if( !verifyEnvelope( envelope )) {
-      System.out.println("Security verifications failed.");
-      // TODO: let client know something bad happend
+    	throw new SecurityVerificationException();
     }
     System.out.println("Security verifications passed.");
 
@@ -55,8 +56,7 @@ public class PasswordManagerWSImpl implements PasswordManagerWS {
 
     // Do crypto evaluations
     if( !verifyEnvelope( envelope )) {
-      System.out.println("Security verifications failed.");
-      // TODO: let client know something bad happend
+    	throw new SecurityVerificationException();
     }
     System.out.println("Security verifications passed.");
 
@@ -83,8 +83,7 @@ public class PasswordManagerWSImpl implements PasswordManagerWS {
 
     // Do crypto evaluations
     if( !verifyEnvelope( envelope )) {
-      System.out.println("Security verifications failed.");
-      // TODO: let client know something bad happend
+    	throw new SecurityVerificationException();
     }
     System.out.println("Security verifications passed.");
 

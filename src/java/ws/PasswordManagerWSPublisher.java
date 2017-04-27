@@ -2,8 +2,8 @@ package ws;
 
 import javax.xml.ws.Endpoint;
 
-import message.PasswordManagerMessages;
 import crypto.Crypto;
+import message.PasswordManagerMessages;
 
 public class PasswordManagerWSPublisher {
 
