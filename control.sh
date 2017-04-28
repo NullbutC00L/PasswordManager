@@ -2,21 +2,33 @@
 # Read pids into an array
 OIFS="$IFS"; IFS=$'\n'; PIDS=($(<pids.txt)); IFS="$OIFS"
 
-PROCESS=${PIDS[((--$2))]}
+# Prevent error assigning variable
+if [ $2 != "all" ]
+then
+  PROCESS=${PIDS[((--$2))]}
+fi 
+
 case $1 in
-  #start )
-    #echo starting $2
-    #;;
+  resume )
+    kill -SIGCONT $PROCESS
+    echo $PROCESS resumed
+    ;;
   stop )
-    kill -SIGTERM $PROCESS
-    echo $PROCESS stopped
+    if [ $2 == "all" ]
+    then
+      kill -SIGTERM ${PIDS[*]} >& /dev/null
+      echo Stopped all replicas
+    else
+      kill -SIGTERM $PROCESS
+      echo $PROCESS stopped
+    fi
     ;;
   pause )
-    kill -19 $PROCESS
+    kill -SIGSTOP $PROCESS
     echo $PROCESS paused
     ;;
   status )
-    echo status $2
+    ps 28288 -o state,pid,time
     ;;
   * )
     echo Command $1 not found.
