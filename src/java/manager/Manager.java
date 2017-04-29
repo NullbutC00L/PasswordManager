@@ -83,12 +83,12 @@ public class Manager {
 			if(counters.get(pub)<clientCounter){
 			counters.put(pub,clientCounter+1);// update counter value after checking it
 			return true;
-			}else{
-			//throw new CounterIncorrectException();
-				return false;
 			}
+			
+			
 		
 		}
+		//throw new CounterIncorrectException();
 		return false;
 	}
 	
