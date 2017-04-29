@@ -6,7 +6,6 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.util.Properties;
 
-import message.PasswordManagerMessages;
 import crypto.Crypto;
 
 public class PasswordManagerWSPublisher {
