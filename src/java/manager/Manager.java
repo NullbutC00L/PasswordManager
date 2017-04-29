@@ -87,29 +87,15 @@ public class Manager {
 			//throw new CounterIncorrectException();
 				return false;
 			}
-		}
-
-			initCounter(pub);
-			return true;
 		
+		}
+		return false;
 	}
 	
 	public int incrementCounter(int counter){
 		return counter+1;
 	}
 	
-	public int initCounter(String pub){
-		if(!counters.containsKey(pub)){
-			int  value = (int )(Math.random() * 10000);
-			counters.put(pub, value);
-			return value;
-		}
-		else{
-			return counters.get(pub);
-			//throw exception?
-			
-		}
-		}
 	public int getCounter(String pub){
 		return counters.get(pub);
 	}
