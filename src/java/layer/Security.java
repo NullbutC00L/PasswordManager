@@ -18,7 +18,6 @@ public class Security {
 	public Security (Crypto crypto){
 		this.crypto = crypto;
 	}
-	
 	private boolean verifyHMAC( Envelope envelope) {
 	    SecretKey DHSecretKey = dhKeyStore.get( envelope.getDHPublicKey() );
 	    byte[] HMAC = crypto.genMac( util.msgToByteArray( envelope.getMessage() ), DHSecretKey );
@@ -33,16 +32,17 @@ public class Security {
 	  }
 
 	  public void prepareEnvelope( Envelope envelope, byte[] DHPubKeyCli ) {
-	    addHMAC( envelope, DHPubKeyCli );
-	    // TODO: counter
+	    envelope.getMessage().setCounter( crypto.addCounter(DHPubKeyCli) );
+	    envelope.getMessage().setPublicKey( crypto.getPublicKey().getEncoded() ); 
 	    envelope.setDHPublicKey( crypto.getDHPublicKey().getEncoded() );
+	    // Must be the last to add to envelope
+	    addHMAC( envelope, DHPubKeyCli );
 	    return;
 	  }
 
 	  public boolean verifyEnvelope( Envelope envelope ) {
 	    generateDH( envelope );
-	    // TODO: Counter
-	    return verifyHMAC( envelope ); // && verifyCounter( envelope );
+	    return verifyHMAC( envelope ) && crypto.verifyCounter( envelope.getDHPublicKey(), envelope.getMessage().counter );
 	  }
 
 	  private void generateDH( Envelope envelope){
