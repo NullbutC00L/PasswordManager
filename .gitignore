@@ -1,5 +1,6 @@
 keys/
 /Server.class
+pids.txt
 
 #Compiled class file
 *.class

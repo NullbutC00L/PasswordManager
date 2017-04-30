@@ -8,6 +8,7 @@ import java.security.PublicKey;
 import envelope.Envelope;
 import envelope.Message;
 import crypto.Crypto;
+import util.SecretKeyStore;
 import util.Util;
 import exception.PasswordManagerException;
 import manager.Manager;
