@@ -33,7 +33,8 @@ public class Security {
 
 	  public void prepareEnvelope( Envelope envelope, byte[] DHPubKeyCli ) {
 	    addHMAC( envelope, DHPubKeyCli );
-	    crypto.addCounter(DHPubKeyCli);
+	    
+	    envelope.getMessage().setCounter(crypto.addCounter(DHPubKeyCli));
 	    // TODO: counter
 	    envelope.setDHPublicKey( crypto.getDHPublicKey().getEncoded() );
 	    return;
