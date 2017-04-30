@@ -32,17 +32,16 @@ public class Security {
 	  }
 
 	  public void prepareEnvelope( Envelope envelope, byte[] DHPubKeyCli ) {
-	    addHMAC( envelope, DHPubKeyCli );
-	    
-	    envelope.getMessage().setCounter(crypto.addCounter(DHPubKeyCli));
-	    // TODO: counter
+	    envelope.getMessage().setCounter( crypto.addCounter(DHPubKeyCli) );
+	    envelope.getMessage().setPublicKey( crypto.getPublicKey().getEncoded() ); 
 	    envelope.setDHPublicKey( crypto.getDHPublicKey().getEncoded() );
+	    // Must be the last to add to envelope
+	    addHMAC( envelope, DHPubKeyCli );
 	    return;
 	  }
 
 	  public boolean verifyEnvelope( Envelope envelope ) {
 	    generateDH( envelope );
-	    // TODO: Counter
 	    return verifyHMAC( envelope ) && crypto.verifyCounter( envelope.getDHPublicKey(), envelope.getMessage().counter );
 	  }
 

@@ -26,9 +26,10 @@ public class PasswordManagerWSImpl implements PasswordManagerWS {
     if( !security.verifyEnvelope( envelope )) {
       System.out.println("Security verifications failed.");
       // TODO: let client know something bad happend
+    } else{
+    	System.out.println("Security verifications passed.");
     }
-    System.out.println("Security verifications passed.");
-
+    
     manager.register( envelope.getMessage().publicKey );
 
     Envelope renvelope = new Envelope();
@@ -91,7 +92,6 @@ public class PasswordManagerWSImpl implements PasswordManagerWS {
     Message rmsg = new Message();
     renvelope.setMessage( rmsg );
 
-    // Add crypto primitives
     // Add crypto primitives
     security.prepareEnvelope( renvelope, envelope.getDHPublicKey() );
 
