@@ -49,6 +49,6 @@ public class PasswordManagerWSPublisher {
     }
 
     // TODO: change this to "server" + PORT and make client read accordingly
-    CRYPTO.init("server", "server");
+    CRYPTO.init("server"+PORT, "server");
   }
 }

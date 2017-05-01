@@ -1,10 +1,13 @@
 #!/bin/bash 
 
+NUM_REPLICAS=${NUM_REPLICAS:=2}
+PORT=${PORT:=8080}
+
 # funcion that calculates the number of N processes based on the number of f
 # faulty servers
 # ATM returning hardcoded value
 function getN(){
-  echo 8082
+  echo $(($PORT+$NUM_REPLICAS-1))
 }
 
 echo Stopping any running replicas
@@ -21,16 +24,17 @@ done
 > pids.txt
 
 # Prepare keys directory
-make keys &> /dev/null
+mkdir keys &> /dev/null
+rm -rf keys/* &> /dev/null
 
-N=$(getN)
-for PORT in $(seq 8080 $N)
+FINAL_PORT=$(getN)
+for CURRENT_PORT in $(seq $PORT $FINAL_PORT)
 do
-  LOG=/tmp/$PORT.log 
-  PORT=$PORT mvn exec:java >> $LOG & 
+  LOG=/tmp/$CURRENT_PORT.log 
+  PORT=$CURRENT_PORT mvn exec:java > $LOG & 
   # Store pid for futher control (e.g pause, stop)
   echo $! >> pids.txt
-  echo -e "\033[1;32mSUCCESS\033[0m" started replica running on port $PORT. Process PID=$!.
+  echo -e "\033[1;32mSUCCESS\033[0m" started replica running on port $CURRENT_PORT. Process PID=$!.
   echo Output will be printed to $LOG
 done
 
