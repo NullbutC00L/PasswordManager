@@ -2,7 +2,7 @@
 
 NUM_REPLICAS=${NUM_REPLICAS:=6}
 PORT=${PORT:=8080}
-NUM_FAULTS = ${NUM_FAULTS=3}
+NUM_FAULTS = ${NUM_FAULTS:=3}
 
 # function that calculates the number of N processes based on the number of f
 # faulty servers
