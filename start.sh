@@ -2,11 +2,13 @@
 
 NUM_REPLICAS=${NUM_REPLICAS:=2}
 PORT=${PORT:=8080}
+FAULT = $fault
 
-# funcion that calculates the number of N processes based on the number of f
+# function that calculates the number of N processes based on the number of f
 # faulty servers
 # ATM returning hardcoded value
 function getN(){
+  f
   echo $(($PORT+$NUM_REPLICAS-1))
 }
 
@@ -31,6 +33,7 @@ FINAL_PORT=$(getN)
 for CURRENT_PORT in $(seq $PORT $FINAL_PORT)
 do
   LOG=/tmp/$CURRENT_PORT.log 
+  read -p "whats the max fault number" fault
   PORT=$CURRENT_PORT mvn exec:java > $LOG & 
   # Store pid for futher control (e.g pause, stop)
   echo $! >> pids.txt
