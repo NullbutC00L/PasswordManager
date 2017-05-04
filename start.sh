@@ -30,10 +30,10 @@ mkdir keys &> /dev/null
 rm -rf keys/* &> /dev/null
 
 FINAL_PORT=$(getN)
+read -p "whats the max fault number: " fault
 for CURRENT_PORT in $(seq $PORT $FINAL_PORT)
 do
   LOG=/tmp/$CURRENT_PORT.log 
-  read -p "whats the max fault number" fault
   PORT=$CURRENT_PORT mvn exec:java > $LOG & 
   # Store pid for futher control (e.g pause, stop)
   echo $! >> pids.txt
