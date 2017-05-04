@@ -4,22 +4,29 @@ public class Processer{
 	
 	private int N = Integer.valueOf(System.getenv("NUM_REPLICAS"));
 	private int fault=Integer.valueOf(System.getenv("FAULT"));;// fault is the f of the equations on consensus
-	
-	private int wid;
+	private int rid=0;
+	private int wid=0;
 	private int writeAck;
 	
+	public int getRid(){
+		rid=rid+1;
+		return rid;
+	}
 	
 	
 	
-public void writeVerification(int sentwid){
+public boolean writeVerification(int sentwid){
 		
 		if(sentwid==wid){
 			writeAck=writeAck+1;
 			writeCheck();
+			return false;
 		}
 		else if(sentwid>wid){
-			//TODO:do nothing (proceed to writing)
+			wid=sentwid;
+			return true;
 		} 
+		return false;
 		
 		//won't do nothing, not even write 	
 		

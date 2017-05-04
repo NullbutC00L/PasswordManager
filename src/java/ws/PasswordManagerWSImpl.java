@@ -8,6 +8,7 @@ import crypto.Crypto;
 import exception.PasswordManagerException;
 import layer.Security;
 import manager.Manager;
+import layer.Processer;
 
 @WebService(endpointInterface="ws.PasswordManagerWS")
 public class PasswordManagerWSImpl implements PasswordManagerWS {
@@ -15,6 +16,7 @@ public class PasswordManagerWSImpl implements PasswordManagerWS {
   Manager manager = new Manager();
   private Crypto crypto = PasswordManagerWSPublisher.CRYPTO;
   private Security security = new Security(crypto);
+  private Processer processer;
 
   // ##################
   // #### REGISTER ####
@@ -64,6 +66,7 @@ public class PasswordManagerWSImpl implements PasswordManagerWS {
     Message rmsg = new Message();
     rmsg.setPassword( response[0] );
     rmsg.setTripletHash( response[1] );
+    rmsg.setCarrier(processer.getRid());
     renvelope.setMessage( rmsg );
 
     // Add crypto primitives
@@ -86,8 +89,10 @@ public class PasswordManagerWSImpl implements PasswordManagerWS {
     System.out.println("Security verifications passed.");
 
     Message msg = envelope.getMessage();
-    manager.insert(msg.publicKey, msg.domainHash, msg.usernameHash, msg.password, msg.tripletHash);
-
+    
+    if(processer.writeVerification(msg.carrier)){
+    	manager.insert(msg.publicKey, msg.domainHash, msg.usernameHash, msg.password, msg.tripletHash);
+    }
     Envelope renvelope = new Envelope();
     Message rmsg = new Message();
     renvelope.setMessage( rmsg );
