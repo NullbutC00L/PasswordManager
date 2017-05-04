@@ -1,14 +1,13 @@
 #!/bin/bash 
 
-NUM_FAULTS = ${NUM_FAULTS:=1}
-NUM_REPLICAS=${NUM_REPLICAS:=3}
+NUM_FAULTS:=${NUM_FAULTS:=1}
+NUM_REPLICAS:=$((3*${NUM_FAULTS}))
 PORT=${PORT:=8080}
 
 # function that calculates the number of N processes based on the number of f
 # faulty servers
 # ATM returning hardcoded value
 function getN(){
-  NUM_REPLICAS = $((NUM_FAULTS*3))
   echo $(($PORT+$NUM_REPLICAS-1))
 }
 
