@@ -36,8 +36,8 @@ public class Security {
     envelope.getMessage().setCounter( crypto.addCounter(DHPubKeyCli) );
     envelope.getMessage().setPublicKey( crypto.getPublicKey().getEncoded() ); 
     envelope.setDHPublicKey( crypto.getDHPublicKey().getEncoded() );
-    byte[] msg = util.singnableByteArray(envelope.getMessage());
-    envelope.setSignature(crypto.genSign( msg , (PrivateKey)crypto.getPrivateKey() ));
+    //byte[] msg = util.singnableByteArray(envelope.getMessage());
+    //envelope.getMessage().setSignature(crypto.genSign( msg , (PrivateKey)crypto.getPrivateKey() ));
     // Must be the last to add to envelope
     addHMAC( envelope, DHPubKeyCli );
     return;
@@ -45,9 +45,9 @@ public class Security {
 
   public boolean verifyEnvelope( Envelope envelope ) {
     generateDH( envelope );
-    byte[] msg = util.singnableByteArray( envelope.getMessage() );
-    Boolean sign = crypto.verSign(msg, crypto.retrievePubKey(envelope.getMessage().publicKey), envelope.getSignature());
-    return verifyHMAC( envelope ) && sign && crypto.verifyCounter( envelope.getDHPublicKey(), envelope.getMessage().counter);
+    //byte[] msg = util.singnableByteArray( envelope.getMessage() );
+    //Boolean sign = crypto.verSign(msg, crypto.retrievePubKey(envelope.getMessage().publicKey), envelope.getMessage().getSignature());
+    return verifyHMAC( envelope ) && crypto.verifyCounter( envelope.getDHPublicKey(), envelope.getMessage().counter);
   }
 
   private void generateDH( Envelope envelope){
