@@ -53,7 +53,7 @@ public class SecurityWSClient {
 		envelope.getMessage().setPublicKey( _crypto.getPublicKey().getEncoded() ); 
 		envelope.setDHPublicKey( _crypto.getDHPublicKey().getEncoded() );
 		envelope.getMessage().setCounter(_crypto.addCounter(pubKeySrv));
-	    byte[] msg = msgToByteArray(envelope.getMessage());
+	    byte[] msg = singnableByteArray(envelope.getMessage());
 	    envelope.setSignature(_crypto.genSign( msg , (PrivateKey)_crypto.getPrivateKey() ));
 		// Must be the last to add to envelope
 		addHMAC( envelope, pubKeySrv );
@@ -61,7 +61,7 @@ public class SecurityWSClient {
 	}
 
 	public boolean verifyEnvelope( Envelope envelope ) {
-		byte[] msg = msgToByteArray( envelope.getMessage() );
+		byte[] msg = singnableByteArray( envelope.getMessage() );
 		Boolean sign = _crypto.verSign(msg, _crypto.retrievePubKey(envelope.getMessage().getPublicKey()), envelope.getSignature());
 		
 		if( DEBUG ) {
@@ -78,6 +78,7 @@ public class SecurityWSClient {
 		// Store key to save CPU
 		dhKeyStore.put( pubKeySrv , DHSecretKey);
 	}	
+	
 	private byte[] msgToByteArray(Message msg) {
 	    ByteArrayOutputStream outputStream = new ByteArrayOutputStream( );
 	    try {
@@ -99,6 +100,21 @@ public class SecurityWSClient {
 	      e.printStackTrace();
 	      return null;
 	    }
+	}
+	
+	public byte[] singnableByteArray(Message msg) {
+		ByteArrayOutputStream outputStream = new ByteArrayOutputStream( );
+		try {
+			if ( msg.getPassword() != null)
+				outputStream.write( msg.getPassword() );
+			if ( msg.getTripletHash() != null)
+				outputStream.write( msg.getTripletHash() );
+			outputStream.write( msg.getWts() );
+			return outputStream.toByteArray();
+		} catch( Exception e) {
+			e.printStackTrace();
+			return null;
+		}
 	}
 }
 
