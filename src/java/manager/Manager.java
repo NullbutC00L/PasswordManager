@@ -6,7 +6,6 @@ import java.util.Arrays;
 import java.util.HashMap;
 
 import domain.DomainCredentials;
-import exception.CounterIncorrectException;
 import exception.CredentialsNotFoundException;
 import exception.PasswordManagerException;
 import exception.PubKeyAlreadyExistsException;
@@ -16,7 +15,6 @@ import exception.UserAlreadyOnDomainException;
 public class Manager {
 
   private HashMap<ByteBuffer, HashMap<ByteBuffer, ArrayList<DomainCredentials>>> _pubKeys = new HashMap<ByteBuffer, HashMap<ByteBuffer, ArrayList<DomainCredentials>>>();
-  private HashMap<String,Integer > counters = new HashMap<String, Integer>();
 
   private HashMap<ByteBuffer, ArrayList<DomainCredentials>> getPubKey(byte[] pubKey) {
     return _pubKeys.get(ByteBuffer.wrap(pubKey));
@@ -48,7 +46,8 @@ public class Manager {
 
     for (DomainCredentials dc : domainList) {
       if(Arrays.equals(dc.getUsername(), username)){
-        return new byte[][] { dc.getPassword(), dc.getTripletHash() };
+        byte[] ts = new String(""+dc.getTimeStamp()).getBytes();
+        return new byte[][] { dc.getPassword(), dc.getTripletHash(), ts, dc.getSignature() };
       }
     }
 
@@ -56,7 +55,7 @@ public class Manager {
   }
 
 
-  public void insert(byte[] pubKey, byte[] domain, byte[] username, byte[] password, byte[] tripletHash) throws PasswordManagerException{
+  public void insert(byte[] pubKey, byte[] domain, byte[] username, byte[] password, byte[] tripletHash, int timeStamp, byte[] signature) throws PasswordManagerException {
 
     if ( getPubKey(pubKey) == null )
       throw new PubKeyNotFoundException();
@@ -67,7 +66,7 @@ public class Manager {
     }
     catch(CredentialsNotFoundException e){
       addDomain(pubKey, domain);
-      getDomain(pubKey, domain).add(new DomainCredentials(username, password, tripletHash));
+      getDomain(pubKey, domain).add(new DomainCredentials(username, password, tripletHash, timeStamp, signature));
     }
   } 
 
@@ -77,29 +76,6 @@ public class Manager {
 
     addPubKey(pubKey);
   } 
-  public int counter(String Mac_address){
-
-
-    int  value = (int )(Math.random() * 10000);;
-
-    if(counters.containsKey(Mac_address)){
-      return counters.get(Mac_address);
-    }
-    else{
-      counters.put(Mac_address,value);
-      return value;
-    }
-
-  }
-  public int counter_checker(String Mac_address,int counter) throws CounterIncorrectException{
-    if(counter>counters.get(Mac_address)){
-      counters.put(Mac_address, counter+1);
-      return counter+1;
-    }
-
-    throw new CounterIncorrectException();
-
-  }
 
   //public void delete(byte[] pubKey, byte[] domain, byte[] username, byte[] password) throws PasswordManagerException{
   //if ( getPubKey(pubKey) == null )

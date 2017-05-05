@@ -27,26 +27,26 @@ public class ManagerTest {
   @Test(expected = CredentialsNotFoundException.class)
     public void searchNotFound() throws PasswordManagerException{
       _manager.register("PublicKey".getBytes());
-      _manager.insert("PublicKey".getBytes(), "instagram".getBytes(), "username".getBytes(), "password".getBytes(), "tripletHash".getBytes());
+      _manager.insert("PublicKey".getBytes(), "instagram".getBytes(), "username".getBytes(), "password".getBytes(), "tripletHash".getBytes(), 1, "signature".getBytes());
       _manager.searchPassword("PublicKey".getBytes(), "facebook".getBytes(), "username".getBytes());
     }
 
   public void searchSuccess() throws PasswordManagerException{
     _manager.register("PublicKey".getBytes());
-    _manager.insert("PublicKey".getBytes(), "instagram".getBytes(), "username".getBytes(), "password".getBytes(), "tripletHash".getBytes());
+    _manager.insert("PublicKey".getBytes(), "instagram".getBytes(), "username".getBytes(), "password".getBytes(), "tripletHash".getBytes(), 1 ,"signature".getBytes());
     byte[][] password = _manager.searchPassword("PublicKey".getBytes(), "instagram".getBytes(), "username".getBytes());
     assertArrayEquals("password".getBytes(), password[0]);
   }
 
   @Test(expected = PubKeyNotFoundException.class)
     public void insertNotRegistered() throws PasswordManagerException{
-      _manager.insert("PublicKey".getBytes(), "facebook".getBytes(), "username".getBytes(), "password".getBytes(), "tripletHash".getBytes());
+      _manager.insert("PublicKey".getBytes(), "facebook".getBytes(), "username".getBytes(), "password".getBytes(), "tripletHash".getBytes(), 1, "signature".getBytes());
     }
 
   @Test
   public void insertSuccess() throws PasswordManagerException{
     _manager.register("PublicKey".getBytes());
-    _manager.insert("PublicKey".getBytes(), "facebook".getBytes(), "username".getBytes(), "password".getBytes(), "tripletHash".getBytes());
+    _manager.insert("PublicKey".getBytes(), "facebook".getBytes(), "username".getBytes(), "password".getBytes(), "tripletHash".getBytes(), 1, "signature".getBytes());
     byte[][] res = _manager.searchPassword("PublicKey".getBytes(), "facebook".getBytes(), "username".getBytes());
     assertArrayEquals("password".getBytes(), res[0]);
   }
@@ -54,8 +54,8 @@ public class ManagerTest {
   @Test(expected = UserAlreadyOnDomainException.class)
     public void insertTwice() throws PasswordManagerException{
       _manager.register("PublicKey".getBytes());
-      _manager.insert("PublicKey".getBytes(), "facebook".getBytes(), "username".getBytes(), "password".getBytes(), "tripletHash".getBytes());
-      _manager.insert("PublicKey".getBytes(), "facebook".getBytes(), "username".getBytes(), "newPassword".getBytes(), "tripletHash".getBytes());
+      _manager.insert("PublicKey".getBytes(), "facebook".getBytes(), "username".getBytes(), "password".getBytes(), "tripletHash".getBytes(), 1, "signature".getBytes());
+      _manager.insert("PublicKey".getBytes(), "facebook".getBytes(), "username".getBytes(), "newPassword".getBytes(), "tripletHash".getBytes(), 1, "signature".getBytes());
     }
 
   //@Test(expected = PubKeyNotFoundException.class)

@@ -6,6 +6,7 @@ import envelope.Envelope;
 import envelope.Message;
 import crypto.Crypto;
 import exception.PasswordManagerException;
+import layer.Communication;
 import layer.Security;
 import manager.Manager;
 
@@ -15,7 +16,8 @@ public class PasswordManagerWSImpl implements PasswordManagerWS {
   Manager manager = new Manager();
   private Crypto crypto = PasswordManagerWSPublisher.CRYPTO;
   private Security security = new Security(crypto);
-
+  private Communication communication = new Communication(crypto);
+  
   // ##################
   // #### REGISTER ####
   // ##################
@@ -58,12 +60,14 @@ public class PasswordManagerWSImpl implements PasswordManagerWS {
     System.out.println("Security verifications passed.");
 
     Message msg = envelope.getMessage();
-    byte[][] response = manager.searchPassword(msg.publicKey, msg.domainHash, msg.usernameHash);
+    byte[][] response = manager.searchPassword(msg.getPublicKey(), msg.getDomainHash(), msg.getUsernameHash());
 
     Envelope renvelope = new Envelope();
     Message rmsg = new Message();
     rmsg.setPassword( response[0] );
     rmsg.setTripletHash( response[1] );
+    rmsg.setWts( Integer.valueOf(new String(response[2])).intValue());
+    rmsg.setSignature( response[3] );
     renvelope.setMessage( rmsg );
 
     // Add crypto primitives
@@ -86,7 +90,7 @@ public class PasswordManagerWSImpl implements PasswordManagerWS {
     System.out.println("Security verifications passed.");
 
     Message msg = envelope.getMessage();
-    manager.insert(msg.publicKey, msg.domainHash, msg.usernameHash, msg.password, msg.tripletHash);
+    manager.insert(msg.publicKey, msg.getDomainHash(), msg.getUsernameHash(), msg.getPassword(), msg.getTripletHash(), msg.getWts(), msg.getSignature());
 
     Envelope renvelope = new Envelope();
     Message rmsg = new Message();
