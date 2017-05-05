@@ -53,23 +53,23 @@ public class SecurityWSClient {
     envelope.getMessage().setPublicKey( _crypto.getPublicKey().getEncoded() ); 
     envelope.setDHPublicKey( _crypto.getDHPublicKey().getEncoded() );
     envelope.getMessage().setCounter(_crypto.addCounter(pubKeySrv));
-    byte[] msg = singnableByteArray(envelope.getMessage());
-    envelope.setSignature(_crypto.genSign( msg , (PrivateKey)_crypto.getPrivateKey() ));
+    //byte[] msg = singnableByteArray(envelope.getMessage());
+    //envelope.getMessage().setSignature(_crypto.genSign( msg , (PrivateKey)_crypto.getPrivateKey() ));
     // Must be the last to add to envelope
     addHMAC( envelope, pubKeySrv );
     return;
   }
 
   public boolean verifyEnvelope( Envelope envelope ) {
-    byte[] msg = singnableByteArray( envelope.getMessage() );
-    Boolean sign = _crypto.verSign(msg, _crypto.retrievePubKey(envelope.getMessage().getPublicKey()), envelope.getSignature());
+    //byte[] msg = singnableByteArray( envelope.getMessage() );
+    //Boolean sign = _crypto.verSign(msg, _crypto.retrievePubKey(envelope.getMessage().getPublicKey()), envelope.getMessage().getSignature());
 
     if( DEBUG ) {
       System.out.println("[DEBUG] MAC verification passed? " + verifyHMAC( envelope ));
       System.out.println("[DEBUG] Counter verification passed? " + _crypto.verifyCounter( envelope.getDHPublicKey(), envelope.getMessage().getCounter() ));
-      System.out.println("[DEBUG] Sign verification passed? " + sign);
+      //System.out.println("[DEBUG] Sign verification passed? " + sign);
     }
-    return verifyHMAC( envelope ) && sign && _crypto.verifyCounter( envelope.getDHPublicKey(), envelope.getMessage().getCounter() );
+    return verifyHMAC( envelope ) && _crypto.verifyCounter( envelope.getDHPublicKey(), envelope.getMessage().getCounter() );
   }
 
   private void generateDH( Envelope envelope, byte[] pubKeySrv ){
@@ -92,6 +92,8 @@ public class SecurityWSClient {
         outputStream.write( msg.getPassword() );
       if ( msg.getTripletHash() != null)
         outputStream.write( msg.getTripletHash() );
+      if ( msg.getSignature() != null)
+        outputStream.write( msg.getSignature() );
       outputStream.write( msg.getWts() );
       outputStream.write( msg.getRid() );
       outputStream.write( msg.getCounter() );

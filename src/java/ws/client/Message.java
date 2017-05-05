@@ -3,6 +3,7 @@ package ws.client;
 
 import javax.xml.bind.annotation.XmlAccessType;
 import javax.xml.bind.annotation.XmlAccessorType;
+import javax.xml.bind.annotation.XmlElement;
 import javax.xml.bind.annotation.XmlType;
 
 
@@ -24,6 +25,7 @@ import javax.xml.bind.annotation.XmlType;
  *         &lt;element name="publicKey" type="{http://www.w3.org/2001/XMLSchema}base64Binary" minOccurs="0"/>
  *         &lt;element name="wts" type="{http://www.w3.org/2001/XMLSchema}int"/>
  *         &lt;element name="rid" type="{http://www.w3.org/2001/XMLSchema}int"/>
+ *         &lt;element name="Signature" type="{http://www.w3.org/2001/XMLSchema}base64Binary" minOccurs="0"/>
  *       &lt;/sequence>
  *     &lt;/restriction>
  *   &lt;/complexContent>
@@ -41,7 +43,8 @@ import javax.xml.bind.annotation.XmlType;
     "counter",
     "publicKey",
     "wts",
-    "rid"
+    "rid",
+    "signature"
 })
 public class Message {
 
@@ -53,6 +56,8 @@ public class Message {
     protected byte[] publicKey;
     protected int wts;
     protected int rid;
+    @XmlElement(name = "Signature")
+    protected byte[] signature;
 
     /**
      * Gets the value of the password property.
@@ -210,6 +215,28 @@ public class Message {
      */
     public void setRid(int value) {
         this.rid = value;
+    }
+
+    /**
+     * Gets the value of the signature property.
+     * 
+     * @return
+     *     possible object is
+     *     byte[]
+     */
+    public byte[] getSignature() {
+        return signature;
+    }
+
+    /**
+     * Sets the value of the signature property.
+     * 
+     * @param value
+     *     allowed object is
+     *     byte[]
+     */
+    public void setSignature(byte[] value) {
+        this.signature = value;
     }
 
 }
