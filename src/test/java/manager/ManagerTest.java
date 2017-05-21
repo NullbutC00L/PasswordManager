@@ -31,6 +31,7 @@ public class ManagerTest {
       _manager.searchPassword("PublicKey".getBytes(), "facebook".getBytes(), "username".getBytes());
     }
 
+  @Test
   public void searchSuccess() throws PasswordManagerException{
     _manager.register("PublicKey".getBytes());
     _manager.insert("PublicKey".getBytes(), "instagram".getBytes(), "username".getBytes(), "password".getBytes(), "tripletHash".getBytes(), 1 ,"signature".getBytes());
@@ -58,30 +59,30 @@ public class ManagerTest {
       _manager.insert("PublicKey".getBytes(), "facebook".getBytes(), "username".getBytes(), "newPassword".getBytes(), "tripletHash".getBytes(), 1, "signature".getBytes());
     }
 
-  //@Test(expected = PubKeyNotFoundException.class)
-    //public void deleteNotRegistered() {
-      //_manager.delete("PublicKey".getBytes(), "should".getBytes(), "return".getBytes(), "exception".getBytes());
-    //}
+  @Test(expected = PubKeyNotFoundException.class)
+    public void deleteNotRegistered() throws PasswordManagerException{
+      _manager.delete("PublicKey".getBytes(), "should".getBytes(), "return".getBytes(), "exception".getBytes());
+    }
 
-  //@Test(expected = CredentialsNotFoundException.class)
-    //public void deleteWhileEmpty() {
-      //_manager.register("PublicKey".getBytes());
-      //_manager.delete("PublicKey".getBytes(), "should".getBytes(), "return".getBytes(), "exception".getBytes());
-    //}
+  @Test(expected = CredentialsNotFoundException.class)
+    public void deleteWhileEmpty() throws PasswordManagerException{
+      _manager.register("PublicKey".getBytes());
+      _manager.delete("PublicKey".getBytes(), "should".getBytes(), "return".getBytes(), "exception".getBytes());
+    }
 
-  //@Test(expected = CredentialsNotFoundException.class)
-    //public void deleteNotFound() {
-      //_manager.register("PublicKey".getBytes());
-      //_manager.insert("PublicKey".getBytes(), "facebook".getBytes(), "username".getBytes(), "password".getBytes());
-      //_manager.delete("PublicKey".getBytes(), "instagram".getBytes(), "return".getBytes(), "exception".getBytes());
-    //}
+  @Test(expected = CredentialsNotFoundException.class)
+    public void deleteNotFound() throws PasswordManagerException{
+      _manager.register("PublicKey".getBytes());
+      _manager.insert("PublicKey".getBytes(), "facebook".getBytes(), "username".getBytes(), "password".getBytes(), "triplet".getBytes(), 1, "sign".getBytes());
+      _manager.delete("PublicKey".getBytes(), "instagram".getBytes(), "return".getBytes(), "exception".getBytes());
+    }
 
-  //@Test
-  //public void deleteSuccess() {
-    //_manager.register("PublicKey".getBytes());
-    //_manager.insert("PublicKey".getBytes(), "facebook".getBytes(), "username".getBytes(), "password".getBytes());
-    //_manager.delete("PublicKey".getBytes(), "facebook".getBytes(), "username".getBytes(), "password".getBytes());
-  //}
+  @Test
+  public void deleteSuccess() throws PasswordManagerException {
+    _manager.register("PublicKey".getBytes());
+    _manager.insert("PublicKey".getBytes(), "facebook".getBytes(), "username".getBytes(), "password".getBytes(), "triplet".getBytes(), 1, "sign".getBytes());
+    _manager.delete("PublicKey".getBytes(), "facebook".getBytes(), "username".getBytes(), "password".getBytes());
+  }
 
   @Test
   public void registerSuccess() throws PasswordManagerException{

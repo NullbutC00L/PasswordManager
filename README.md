@@ -6,11 +6,17 @@ Password Manager Server
 To start the project use the `start.sh` script
 You can pass the number of replicas, `NUM_REPLICAS` and starting port, `PORT`.
 
-The default usage will start to replicas, on ports 8080 and 8081.
+**Running the tests**
+Make sure to have the server running
+```
+$ ./start.sh
+```
+
+The default usage will start 4 replicas, on ports 8080 to 8083.
 
 **Example**: To start 3 replicas beggining on port 8080:
 ```
-$ NUM_REPLICAS=3 ./start.sh
+$ NUM_REPLICAS=5 ./start.sh
 ```
 
 ### Controlling

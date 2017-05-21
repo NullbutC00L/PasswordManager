@@ -10,11 +10,14 @@ import java.util.HashMap;
 import java.util.Properties;
 
 import crypto.Crypto;
+import layer.Communication;
 import ws.client.PasswordManagerWSImplService;
 
 public class PasswordManagerWSPublisher {
 
   protected static Crypto CRYPTO = new Crypto();
+  public static ws.client.PasswordManagerWS _passwordmanagerWS;
+  public static Communication communication;
   public static HashMap<String, ws.client.PasswordManagerWS> replicas = new HashMap<String, ws.client.PasswordManagerWS>();
   private static String ADDRESS;
   private static String PORT;
@@ -69,8 +72,10 @@ public class PasswordManagerWSPublisher {
     for( ; FIRSTPORT < lastPort ; FIRSTPORT++ ) {
     	connect(FIRSTPORT, MAX_ATTEMPTS);
     }
-
+    
     CRYPTO.init("server"+PORT, "server");
+    communication = new Communication(CRYPTO);
+    communication.init();
   }
   
   private static void connect(int port, int attempts){
@@ -78,7 +83,8 @@ public class PasswordManagerWSPublisher {
 		  try {
 			  URL url = new URL("http://localhost:"+port+"/WS/PasswordManager?wsdl");
 			  PasswordManagerWSImplService pmWSImplService = new PasswordManagerWSImplService(url);
-			  replicas.put("server"+port, pmWSImplService.getPasswordManagerWSImplPort());
+			  _passwordmanagerWS = pmWSImplService.getPasswordManagerWSImplPort();
+			  replicas.put("server"+port, _passwordmanagerWS);
 			  System.out.println("Connected to replica: " + pmWSImplService.getWSDLDocumentLocation().toString());
 			  return;
 		  } catch (MalformedURLException e) {

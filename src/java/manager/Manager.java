@@ -65,6 +65,7 @@ public class Manager {
       throw new UserAlreadyOnDomainException();
     }
     catch(CredentialsNotFoundException e){
+    	System.out.println("[manager] Wrote entry for "+ new String(pubKey));
       addDomain(pubKey, domain);
       getDomain(pubKey, domain).add(new DomainCredentials(username, password, tripletHash, timeStamp, signature));
     }
@@ -77,22 +78,22 @@ public class Manager {
     addPubKey(pubKey);
   } 
 
-  //public void delete(byte[] pubKey, byte[] domain, byte[] username, byte[] password) throws PasswordManagerException{
-  //if ( getPubKey(pubKey) == null )
-  //throw new PubKeyNotFoundException();
+  public void delete(byte[] pubKey, byte[] domain, byte[] username, byte[] password) throws PasswordManagerException{
+    if ( getPubKey(pubKey) == null )
+      throw new PubKeyNotFoundException();
 
-  //ArrayList<DomainCredentials> domainList = getDomain(pubKey, domain);
+    ArrayList<DomainCredentials> domainList = getDomain(pubKey, domain);
 
-  //if ( domainList == null )
-  //throw new CredentialsNotFoundException();
+    if ( domainList == null )
+      throw new CredentialsNotFoundException();
 
-  //for (DomainCredentials dc : domainList) {
-  //if(Arrays.equals(dc.getUsername(), username) && Arrays.equals(dc.getPassword(), password)){
-  //domainList.remove(dc);
-  //return;
-  //}
-  //}
+    for (DomainCredentials dc : domainList) {
+      if(Arrays.equals(dc.getUsername(), username) && Arrays.equals(dc.getPassword(), password)){
+        domainList.remove(dc);
+        return;
+      }
+    }
 
-  //throw new CredentialsNotFoundException();
-  //}
+    throw new CredentialsNotFoundException();
+  }
 }

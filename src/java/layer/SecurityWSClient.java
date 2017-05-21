@@ -4,7 +4,6 @@
 package layer;
 
 import java.io.ByteArrayOutputStream;
-import java.security.PrivateKey;
 import java.security.PublicKey;
 import java.util.Arrays;
 
@@ -53,21 +52,16 @@ public class SecurityWSClient {
     envelope.getMessage().setPublicKey( _crypto.getPublicKey().getEncoded() ); 
     envelope.setDHPublicKey( _crypto.getDHPublicKey().getEncoded() );
     envelope.getMessage().setCounter(_crypto.addCounter(pubKeySrv));
-    //byte[] msg = singnableByteArray(envelope.getMessage());
-    //envelope.getMessage().setSignature(_crypto.genSign( msg , (PrivateKey)_crypto.getPrivateKey() ));
+
     // Must be the last to add to envelope
     addHMAC( envelope, pubKeySrv );
     return;
   }
 
   public boolean verifyEnvelope( Envelope envelope ) {
-    //byte[] msg = singnableByteArray( envelope.getMessage() );
-    //Boolean sign = _crypto.verSign(msg, _crypto.retrievePubKey(envelope.getMessage().getPublicKey()), envelope.getMessage().getSignature());
-
     if( DEBUG ) {
       System.out.println("[DEBUG] MAC verification passed? " + verifyHMAC( envelope ));
       System.out.println("[DEBUG] Counter verification passed? " + _crypto.verifyCounter( envelope.getDHPublicKey(), envelope.getMessage().getCounter() ));
-      //System.out.println("[DEBUG] Sign verification passed? " + sign);
     }
     return verifyHMAC( envelope ) && _crypto.verifyCounter( envelope.getDHPublicKey(), envelope.getMessage().getCounter() );
   }

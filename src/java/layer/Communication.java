@@ -2,31 +2,33 @@ package layer;
 
 import java.io.File;
 import java.nio.file.Files;
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Map.Entry;
-import java.lang.reflect.InvocationTargetException;
-import java.lang.reflect.Method;
 
 import crypto.Crypto;
+import exception.FailedToGetQuorumException;
 import exception.SecurityVerificationException;
-import ws.*;
-import ws.client.PasswordManagerWS;
-import ws.client.Envelope;
-import ws.client.PasswordManagerException_Exception;
+import ws.PasswordManagerWSPublisher;
+import ws.client.*;
 import util.*;
 
 public class Communication {
 
 	private static final String PATH_TO_SERVERS_DHPUBKEYS = "../PasswordManager/keys/";
-	private static ws.PasswordManagerWS _passwordmanagerWS;
-	private SecurityWSClient securityLayer;
-	private PublicKeyStore dhPubKeyStore = new PublicKeyStore();
-	private Class<?>[] envelopeClass = new Class[]{Envelope.class};
+	private int NUM_REPLICAS = Integer.valueOf(System.getenv("NUM_REPLICAS"));
+	private int NUM_FAULTS = Integer.valueOf(System.getenv("NUM_FAULTS"));
+	
+	public static PublicKeyStore dhPubKeyStore = new PublicKeyStore();
+	private static SecurityWSClient securityLayer;
 	private HashMap<String, PasswordManagerWS> replicas = PasswordManagerWSPublisher.replicas;
 
 	public Communication (Crypto crypto){
 	    securityLayer = new SecurityWSClient(crypto);
-	    getDHPubKeysSrvs();
+	}
+	
+	public void init(){
+		getDHPubKeysSrvs();		
 	}
 	
 	private void getDHPubKeysSrvs(){
@@ -34,73 +36,96 @@ public class Communication {
 		try {
 			  File dir = new File(PATH_TO_SERVERS_DHPUBKEYS);
 			  File[] directoryListing = dir.listFiles();
-			  
+
 			  for (File file : directoryListing) {
 				  if (file.toString().endsWith(".pubKey")){
 					  try {
-						  byte[] pubKeyBytes = Files.readAllBytes(file.toPath());
+						  byte[] DHpubKeyBytes = Files.readAllBytes(file.toPath());
 
 						  // get only the filename in a path e.g( file in /this/is/a/path/to/file.pubKey)
 						  String fileName = file.getName();
 						  fileName = fileName.substring(0, fileName.lastIndexOf("."));
-						  
+						  System.out.println("[Debug] Read " + fileName);
 						  // Store for future uses in the pubkey store
-						  dhPubKeyStore.put( fileName, pubKeyBytes);
+						  dhPubKeyStore.put( fileName, DHpubKeyBytes);
 						   
 					  } catch (Exception e) {
-						  e.printStackTrace();
 						  System.out.println("Error reading server DH pubkey file");
+						  e.printStackTrace();
 					  }			    
 				  }
 			  }
 		} catch (Exception e){
-			e.printStackTrace();
 			System.out.println("Error reading server DH pubkey file");
+			e.printStackTrace();
 		}
 	}
 	
 	// ## PUT ##
-	public Boolean put(Envelope envelope) throws PasswordManagerException_Exception {
+	public boolean put(Envelope envelope) {
 		try {
-			Method put = _passwordmanagerWS.getClass().getMethod("put", envelopeClass);
-			send(put, envelope);
+			broadcast(envelope);
 			return true;
-		} catch( NoSuchMethodException e){
-			System.out.println("[Communication] Error calling put method");
-			return false;
 		} catch( Exception e ){
-			System.out.println(e.getMessage());
+			e.printStackTrace();
 			System.out.println("[Communication] Put method failed");
 			return false;
 		}
 	}
 
-	public Envelope send( Method method, Envelope envelope ) throws SecurityVerificationException {
-	  
-		for (Entry<String, PasswordManagerWS> pmWS : replicas.entrySet()) {
-			
-			String serverName = pmWS.getKey();
-			PasswordManagerWS server = pmWS.getValue();
+	public Envelope send( Envelope envelope, PasswordManagerWS server, String serverName ) 
+			throws SecurityVerificationException {		
+		try {
+
+			System.out.println("[DEBUG] dhPubKey: " + serverName);
 			byte[] pubkey = dhPubKeyStore.get(serverName);
 			securityLayer.prepareEnvelope( envelope, pubkey);
+			
+			Envelope rEnvelope = server.put(envelope);
 
+			if( !securityLayer.verifyEnvelope( rEnvelope )) {
+				System.out.println("Security verifications failed for " + serverName);
+				throw new SecurityVerificationException();
+			}
+
+			System.out.println("Security verifications passed.");
+			return rEnvelope;
+
+		} catch ( IllegalArgumentException | PasswordManagerException_Exception e) {
+			e.printStackTrace();
+			return null;
+		}
+	}
+	
+	public Envelope broadcast(Envelope envelope) throws FailedToGetQuorumException {
+		ArrayList<Envelope> readList = new ArrayList<Envelope>();
+		double quorum = Math.ceil((NUM_REPLICAS+NUM_FAULTS)/2);
+		Envelope rEnvelope = null;
+		
+		for (Entry<String, PasswordManagerWS> pmWS : replicas.entrySet()) {
+			String serverName = pmWS.getKey();
+			System.out.println("[COMMUNICATION] carri "+ serverName);
+			PasswordManagerWS server = pmWS.getValue();
 			try {
-				Envelope rEnvelope = (Envelope) method.invoke(server, envelope);
-
-				if( !securityLayer.verifyEnvelope( rEnvelope )) {
-					System.out.println("Security verifications failed... Aborting");
-					throw new SecurityVerificationException();
-				}
-
-				System.out.println("Security verifications passed.");
-				return rEnvelope;
-
-			} catch (IllegalAccessException | IllegalArgumentException | InvocationTargetException e) {
+				rEnvelope = send(envelope, server, serverName);
+				System.out.println("[DEBUG] response " + rEnvelope.getMessage().getWts());
+				System.out.println("[DEBUG] Server " + serverName + " responded");
+				readList.add(rEnvelope);
+				System.out.println("[DEBUG] READLIST SIZE " + readList.size());
+				if( readList.size() > quorum)
+					break;
+			} catch(Exception e){
+				// verifications failed. not valid
 				e.printStackTrace();
-				return null;
+				continue;
 			}
 		}
 		
-		return null;
+		// broadcast ended without quorum
+		System.out.println("[DEBUG] READLIST SIZE " + readList.size() + " and the quorum "+ quorum);
+		if( !(readList.size() > quorum) )
+			throw new FailedToGetQuorumException();
+		
+		return rEnvelope;
 	}
 }
